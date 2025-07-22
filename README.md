@@ -2,11 +2,12 @@
 
 **Aviator Crash Game** is an exciting and dynamic multiplayer betting game where players test their luck and timing to win big! With a sleek, responsive interface and real-time gameplay powered by cutting-edge technologies, this game offers an engaging experience for users.
 
-## 📩 Contact Me on Telegram
+## �‍💻 Author
 
-For inquiries, collaborations, or support, feel free to reach out:
+**Akash Mahla** - Full Stack Developer & Game Creator
 
-[![Telegram Contact](https://img.shields.io/badge/Telegram-Contact%20Me-blue?logo=telegram&style=for-the-badge)](https://t.me/cashblaze129)
+[![GitHub](https://img.shields.io/badge/GitHub-akashmahlax-black?logo=github&style=for-the-badge)](https://github.com/akashmahlax)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Akash%20Mahla-blue?logo=linkedin&style=for-the-badge)](https://linkedin.com/in/akashmahlax)
 
 ## 🌟 Features
 
@@ -98,3 +99,31 @@ npm run dev
 ## 📜 Provably Fair
 
 Each game round is provably fair, ensuring that the outcome is random and cannot be tampered with.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/akashmahlax/aviator-crash/issues).
+
+## 📝 License
+
+This project is created by **Akash Mahla**. All rights reserved.
+
+## 🙏 Acknowledgments
+
+- Built with passion by Akash Mahla
+- Thanks to the React and Node.js communities for their amazing tools
+- Special thanks to all beta testers and contributors
+
+---
+
+### 💻 About the Developer
+
+**Akash Mahla** is a passionate full-stack developer specializing in modern web technologies. With expertise in React, Node.js, and real-time applications, Akash creates engaging and innovative gaming experiences.
+
+**Skills**: React.js, TypeScript, Node.js, MongoDB, Socket.IO, Game Development
+
+**Contact**: [Telegram](https://t.me/cashblaze129) | [GitHub](https://github.com/akashmahlax)
+
+---
+
+⭐ **Star this repository if you found it helpful!** ⭐
