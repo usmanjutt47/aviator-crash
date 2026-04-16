@@ -186,11 +186,15 @@ export interface SeedDetailsType {
   flyDetailID: number;
 }
 
+const unityBaseUrl = process.env.PUBLIC_URL
+  ? `${process.env.PUBLIC_URL}/unity`
+  : "/unity";
+
 export const unityContext = new UnityContext({
-  loaderUrl: "/unity/AirCrash.loader.js",
-  dataUrl: "/unity/AirCrash.data.unityweb",
-  frameworkUrl: "/unity/AirCrash.framework.js.unityweb",
-  codeUrl: "/unity/AirCrash.wasm.unityweb",
+  loaderUrl: `${unityBaseUrl}/AirCrash.loader.js`,
+  dataUrl: `${unityBaseUrl}/AirCrash.data.unityweb`,
+  frameworkUrl: `${unityBaseUrl}/AirCrash.framework.js.unityweb`,
+  codeUrl: `${unityBaseUrl}/AirCrash.wasm.unityweb`,
 });
 
 export const init_state = {
