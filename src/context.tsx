@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { io, Socket } from "socket.io-client";
 import { toast } from "react-toastify";
-import { config } from "./config";
+import { LocalGameEngine } from "./utils/localGameEngine";
 import {
   UserType,
   BettedUserType,
@@ -30,39 +29,10 @@ export interface PlayerType {
 }
 
 const Context = React.createContext<ContextType>(null!);
-
-const socketEndpoint = (() => {
-  if (typeof window === "undefined") return "http://localhost:5001";
-
-  // For development mode on localhost, use localhost backend
-  if (config.development && window.location.hostname === "localhost") {
-    return config.wss || "http://localhost:5001";
-  }
-
-  // For production or any non-localhost, use current origin + /api fallback
-  // This ensures cross-device sharing works (everyone connects to same Vercel domain)
-  if (config.wss && !config.development) {
-    return config.wss;
-  }
-
-  // Fallback: use window.location.origin (works for all deployed instances)
-  return window.location.origin;
-})();
-
-const socket: Socket = io(socketEndpoint, {
-  transports: ["websocket", "polling"],
-  autoConnect: true,
-  reconnection: true,
-  reconnectionAttempts: Infinity,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  timeout: 20000,
-  forceNew: false,
-});
+const engine = new LocalGameEngine();
 
 export const callCashOut = (at: number, index: "f" | "s") => {
-  let data = { type: index, endTarget: at };
-  socket.emit("cashOut", data);
+  engine.cashOut({ type: index, endTarget: at });
 };
 
 let fIncreaseAmount = 0;
@@ -85,10 +55,7 @@ export const Provider = ({ children }: any) => {
   const [msgData, setMsgData] = React.useState<MsgUserType[]>([]);
   const [msgTab, setMsgTab] = React.useState<boolean>(false);
   const [msgReceived, setMsgReceived] = React.useState<boolean>(false);
-  const [platformLoading] = React.useState<boolean>(false);
   const [errorBackend, setErrorBackend] = React.useState<boolean>(false);
-  const [secure] = React.useState<boolean>(false);
-  const [userSeedText] = React.useState<string>("");
   const [globalUserInfo] = React.useState<UserType>(init_userInfo);
   const [fLoading, setFLoading] = React.useState<boolean>(false);
   const [sLoading, setSLoading] = React.useState<boolean>(false);
@@ -195,78 +162,50 @@ export const Provider = ({ children }: any) => {
       }, 2000);
     };
 
-    // Socket connection event handlers
-    socket.on("connect", () => {
-      console.log("✅ Connected to backend server");
+    const handleConnect = () => {
+      console.log("✅ Local game engine ready");
       hasConnectedRef.current = true;
       clearDisconnectTimer();
       setErrorBackend(false);
-      socket.emit("enterRoom", { token });
-    });
+    };
 
-    socket.on("disconnect", () => {
-      console.log("❌ Disconnected from backend server");
-      scheduleDisconnectAlert();
-    });
-
-    socket.on("connect_error", (error) => {
-      console.error("🔴 Connection error:", error);
-      scheduleDisconnectAlert();
-    });
-
-    socket.on("reconnect", () => {
-      console.log("🔄 Reconnected to backend server");
-      hasConnectedRef.current = true;
-      clearDisconnectTimer();
-      setErrorBackend(false);
-      socket.emit("enterRoom", { token });
-    });
-
-    socket.on("reconnect_error", (error) => {
-      console.error("🔴 Reconnect error:", error);
-      scheduleDisconnectAlert();
-    });
-
-    socket.on("bettedUserInfo", (bettedUsers: BettedUserType[]) => {
+    const handleBettedUserInfo = (bettedUsers: BettedUserType[]) => {
       setBettedUsers(bettedUsers);
-    });
+    };
 
-    socket.on("myBetState", (user: UserType) => {
-      const attrs = userBetState;
-      attrs.fbetState = false;
-      attrs.fbetted = user.f.betted;
-      attrs.sbetState = false;
-      attrs.sbetted = user.s.betted;
-      setUserBetState(attrs);
-    });
+    const handleMyBetState = (user: UserType) => {
+      setUserBetState({
+        fbetState: false,
+        fbetted: user.f.betted,
+        sbetState: false,
+        sbetted: user.s.betted,
+      });
+    };
 
-    socket.on("myInfo", (user: UserType) => {
-      let attrs = state;
-      attrs.userInfo.balance = user.balance;
-      attrs.userInfo.userType = user.userType;
-      attrs.userInfo.userName = user.userName;
-      update(attrs);
-    });
+    const handleMyInfo = (user: UserType) => {
+      setUserInfo(user);
+      update({ userInfo: user });
+    };
 
-    socket.on("history", (history: any) => {
-      setHistory(history);
-    });
+    const handleHistory = (historyData: number[]) => {
+      setHistory(historyData);
+    };
 
-    socket.on("gameState", (gameState: GameStatusType) => {
-      setGameState(gameState);
-    });
+    const handleGameState = (gameStateData: GameStatusType) => {
+      setGameState(gameStateData);
+    };
 
-    socket.on("previousHand", (previousHand: BettedUserType[]) => {
-      setPreviousHand(previousHand);
-    });
+    const handlePreviousHand = (previousHandData: BettedUserType[]) => {
+      setPreviousHand(previousHandData);
+    };
 
-    socket.on("finishGame", (user: UserType) => {
-      let attrs = newState;
+    const handleFinishGame = (user: UserType) => {
+      let attrs = { ...newState };
       let fauto = attrs.userInfo.f.auto;
       let sauto = attrs.userInfo.s.auto;
       let fbetAmount = attrs.userInfo.f.betAmount;
       let sbetAmount = attrs.userInfo.s.betAmount;
-      let betStatus = newBetState;
+      let betStatus = { ...newBetState };
       attrs.userInfo = user;
       attrs.userInfo.f.betAmount = fbetAmount;
       attrs.userInfo.s.betAmount = sbetAmount;
@@ -338,45 +277,64 @@ export const Provider = ({ children }: any) => {
       }
       update(attrs);
       setUserBetState(betStatus);
-    });
+    };
 
-    socket.on("getBetLimits", (betAmounts: { max: number; min: number }) => {
+    const handleBetLimits = (betAmounts: { max: number; min: number }) => {
       setBetLimit({ maxBet: betAmounts.max, minBet: betAmounts.min });
-    });
+    };
 
-    socket.on("recharge", () => {
+    const handleRecharge = () => {
       setRechargeState(true);
-    });
+    };
 
-    socket.on("error", (data) => {
-      setUserBetState({
-        ...userBetState,
+    const handleError = (data: any) => {
+      setUserBetState((prev) => ({
+        ...prev,
         [`${data.index}betted`]: false,
-      });
+      }));
       toast.error(data.message);
-    });
+    };
 
-    socket.on("success", (data) => {
+    const handleSuccess = (data: any) => {
       toast.success(data);
-    });
+    };
+
+    const handleMessages = (messages: MsgUserType[]) => {
+      setMsgData(messages);
+      setMsgReceived((prev) => !prev);
+    };
+
+    engine.on("connect", handleConnect);
+    engine.on("bettedUserInfo", handleBettedUserInfo);
+    engine.on("myBetState", handleMyBetState);
+    engine.on("myInfo", handleMyInfo);
+    engine.on("history", handleHistory);
+    engine.on("gameState", handleGameState);
+    engine.on("previousHand", handlePreviousHand);
+    engine.on("finishGame", handleFinishGame);
+    engine.on("getBetLimits", handleBetLimits);
+    engine.on("recharge", handleRecharge);
+    engine.on("error", handleError);
+    engine.on("success", handleSuccess);
+    engine.on("message", handleMessages);
+
+    engine.connect(token || undefined);
+
     return () => {
       clearDisconnectTimer();
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("connect_error");
-      socket.off("reconnect");
-      socket.off("reconnect_error");
-      socket.off("bettedUserInfo");
-      socket.off("myBetState");
-      socket.off("myInfo");
-      socket.off("history");
-      socket.off("gameState");
-      socket.off("previousHand");
-      socket.off("finishGame");
-      socket.off("getBetLimits");
-      socket.off("recharge");
-      socket.off("error");
-      socket.off("success");
+      engine.off("connect", handleConnect);
+      engine.off("bettedUserInfo", handleBettedUserInfo);
+      engine.off("myBetState", handleMyBetState);
+      engine.off("myInfo", handleMyInfo);
+      engine.off("history", handleHistory);
+      engine.off("gameState", handleGameState);
+      engine.off("previousHand", handlePreviousHand);
+      engine.off("finishGame", handleFinishGame);
+      engine.off("getBetLimits", handleBetLimits);
+      engine.off("recharge", handleRecharge);
+      engine.off("error", handleError);
+      engine.off("success", handleSuccess);
+      engine.off("message", handleMessages);
     };
   }, [token]);
 
@@ -393,7 +351,12 @@ export const Provider = ({ children }: any) => {
             return;
           }
         }
-        let data = {
+        const data: {
+          betAmount: number;
+          target: number;
+          type: "f" | "s";
+          auto: boolean;
+        } = {
           betAmount: state.userInfo.f.betAmount,
           target: state.userInfo.f.target,
           type: "f",
@@ -406,7 +369,7 @@ export const Provider = ({ children }: any) => {
           return;
         }
         attrs.userInfo.balance -= state.userInfo.f.betAmount;
-        socket.emit("playBet", data);
+        engine.playBet(data);
         betStatus.fbetState = false;
         betStatus.fbetted = true;
         // update(attrs);
@@ -421,7 +384,12 @@ export const Provider = ({ children }: any) => {
             return;
           }
         }
-        let data = {
+        const data: {
+          betAmount: number;
+          target: number;
+          type: "f" | "s";
+          auto: boolean;
+        } = {
           betAmount: state.userInfo.s.betAmount,
           target: state.userInfo.s.target,
           type: "s",
@@ -434,7 +402,7 @@ export const Provider = ({ children }: any) => {
           return;
         }
         attrs.userInfo.balance -= state.userInfo.s.betAmount;
-        socket.emit("playBet", data);
+        engine.playBet(data);
         betStatus.sbetState = false;
         betStatus.sbetted = true;
         // update(attrs);
@@ -444,26 +412,8 @@ export const Provider = ({ children }: any) => {
   }, [gameState.GameState, userBetState.fbetState, userBetState.sbetState]);
 
   const getMyBets = async () => {
-    try {
-      const response = await fetch(`${config.api}/my-info`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: state.userInfo.userName }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status) {
-          update({ myBets: data.data as GameHistory[] });
-        }
-      } else {
-        console.error("Error:", response.statusText);
-      }
-    } catch (error) {
-      console.log("getMyBets", error);
-    }
+    const bets = engine.getMyBets(state.userInfo.userName);
+    update({ myBets: bets });
   };
 
   useEffect(() => {
@@ -471,44 +421,28 @@ export const Provider = ({ children }: any) => {
   }, [gameState.GameState]);
 
   const updateUserInfo = (attrs: Partial<UserType>) => {
-    setUserInfo((prev) => ({ ...prev, ...attrs }));
+    setUserInfo((prev) => {
+      const updated = { ...prev, ...attrs };
+      if (updated.userId) {
+        engine.updateUserInfo(updated.userId, updated);
+      }
+      return updated;
+    });
   };
   const handleGetSeed = () => {
-    /* implement or stub */
+    const seedValue = Math.random().toString(36).slice(2, 12);
+    update({ seed: seedValue });
   };
   const handleGetSeedOfRound = async (id: number): Promise<SeedDetailsType> => {
-    try {
-      const response = await fetch(`${config.api}/game/seed/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data;
-      } else {
-        throw new Error("Failed to fetch seed details");
-      }
-    } catch (error) {
-      console.error("Error fetching seed details:", error);
-      // Return default data structure to prevent errors
-      return {
-        createdAt: new Date().toISOString(),
-        serverSeed: "",
-        seedOfUsers: [],
-        flyDetailID: id,
-      };
-    }
+    return engine.getSeedOfRound(id);
   };
   const handlePlaceBet = () => {
-    /* implement or stub */
+    // This app now uses the local engine for bets.
   };
   const toggleMsgTab = () => setMsgTab((prev) => !prev);
   const handleChangeUserSeed = (seed: string) => {
-    /* implement or stub */
+    update({ seed });
+    updateUserInfo({ ...userInfo, token: seed, Session_Token: seed });
   };
 
   return (
@@ -520,12 +454,10 @@ export const Provider = ({ children }: any) => {
         ...betLimit,
         userInfo,
         state, // add state for consumers expecting state
-        socket,
         msgData,
         msgTab,
         msgReceived,
         setMsgReceived,
-        platformLoading,
         errorBackend,
         unityState: unity.unityState,
         unityLoading: unity.unityLoading,
@@ -535,9 +467,7 @@ export const Provider = ({ children }: any) => {
         previousHand,
         history,
         rechargeState,
-        secure,
         myUnityContext: sharedUnityContext,
-        userSeedText,
         currentTarget,
         fLoading,
         setFLoading,
@@ -549,6 +479,13 @@ export const Provider = ({ children }: any) => {
         getMyBets,
         updateUserBetState,
         setMsgData,
+        sendMessage: (
+          msgType: string,
+          msgContent: string,
+          userInfo: UserType,
+        ) => {
+          engine.sendMessage({ msgType, msgContent, userInfo });
+        },
         handleGetSeed,
         handleGetSeedOfRound,
         handlePlaceBet,

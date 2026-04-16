@@ -1,15 +1,43 @@
 import React, { useEffect } from "react";
-import axios from "axios";
 import { Oval } from "react-loader-spinner";
 import "./bets.scss";
-import config from "../../config.json";
 import Context from "../../context";
 import { displayName } from "../utils";
+
+const BOT_NAMES = [
+  "Arjun",
+  "Neha",
+  "Rahul",
+  "Pooja",
+  "Aman",
+  "Sneha",
+  "Rohan",
+  "Anjali",
+  "Vikram",
+  "Priya",
+  "Karan",
+  "Meera",
+  "Dev",
+  "Kriti",
+  "Kabir",
+  "Isha",
+  "Nitin",
+  "Riya",
+  "Yash",
+  "Tina",
+];
 
 const TopHistory = () => {
   const { userInfo } = React.useContext(Context);
   const [type, setType] = React.useState(0);
-  const [history, setHistory] = React.useState([]);
+  const [history, setHistory] = React.useState<
+    Array<{
+      _id: number;
+      userinfo: { avatar: string; userName: string }[];
+      betAmount: number;
+      cashoutAt: number;
+    }>
+  >([]);
   const [loadingEffect, setLoadingEffect] = React.useState(false);
   const [headerType, setHeaderType] = React.useState("day");
 
@@ -20,23 +48,26 @@ const TopHistory = () => {
   ];
 
   const callDate = async (date: string) => {
-    try {
-      setLoadingEffect(true);
-      let response = await axios.get(
-        `${process.env.REACT_APP_DEVELOPMENT === "true"
-          ? config.development_api
-          : config.production_api
-        }/get-${date}-history`
-      );
-      if (response?.data?.status) {
-        setHistory(response.data.data);
-        setTimeout(() => {
-          setLoadingEffect(false);
-        }, 500);
-      }
-    } catch (error: any) {
-      console.log("callDate", error);
-    }
+    setLoadingEffect(true);
+    const newHistory = Array.from({ length: 20 }, (_, idx) => {
+      const betAmount = Number((Math.random() * 400 + 20).toFixed(2));
+      const cashoutAt = Number((Math.random() * 8 + 1.1).toFixed(2));
+      return {
+        _id: Date.now() + idx,
+        userinfo: [
+          {
+            avatar: `/avatars/av-${Math.floor(Math.random() * 72) + 1}.png`,
+            userName: BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)],
+          },
+        ],
+        betAmount,
+        cashoutAt,
+      };
+    });
+    setHistory(newHistory);
+    setTimeout(() => {
+      setLoadingEffect(false);
+    }, 500);
   };
   useEffect(() => {
     // Request of Day data
@@ -60,8 +91,9 @@ const TopHistory = () => {
                   setHeaderType(item.value);
                 }
               }}
-              className={`tab ${headerType === item.value ? "active" : "inactive"
-                }`}
+              className={`tab ${
+                headerType === item.value ? "active" : "inactive"
+              }`}
             >
               {item.label}
             </button>
@@ -113,10 +145,9 @@ const TopHistory = () => {
                         <div className="">
                           <span>
                             Bet,{" "}
-                            {`${userInfo?.currency
-                                ? userInfo?.currency
-                                : "PKR"
-                              }`}
+                            {`${
+                              userInfo?.currency ? userInfo?.currency : "PKR"
+                            }`}
                             :&nbsp;
                           </span>
                           <span></span>
@@ -130,12 +161,13 @@ const TopHistory = () => {
                           <span>Cashed out:&nbsp;</span>
                         </div>
                         <span
-                          className={`amount cashout ${Number(item.cashoutAt) < 2
+                          className={`amount cashout ${
+                            Number(item.cashoutAt) < 2
                               ? "blue"
                               : Number(item.cashoutAt) < 10
                                 ? "purple"
                                 : "big"
-                            }`}
+                          }`}
                         >
                           {Number(item.cashoutAt).toFixed(2)}x
                         </span>
@@ -147,10 +179,9 @@ const TopHistory = () => {
                         <div className="">
                           <span>
                             Win,{" "}
-                            {`${userInfo?.currency
-                                ? userInfo?.currency
-                                : "PKR"
-                              }`}
+                            {`${
+                              userInfo?.currency ? userInfo?.currency : "PKR"
+                            }`}
                             : &nbsp;
                           </span>
                         </div>

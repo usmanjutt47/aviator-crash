@@ -3,18 +3,16 @@ import { HiOutlineFaceSmile, HiOutlineGif } from "react-icons/hi2";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import GifPicker, { Theme } from "gif-picker-react";
-import axios from "axios";
 
 import Context from "../../context";
 import "./chat.scss";
-import config from "../../config.json";
 import { displayName } from "../utils";
 import { MsgUserType } from "../../utils/interfaces";
 
 export default function PerfectLiveChat() {
   const {
     userInfo,
-    socket,
+    sendMessage,
     msgTab,
     msgReceived,
     setMsgReceived,
@@ -41,11 +39,7 @@ export default function PerfectLiveChat() {
 
   const handleSendMsg = () => {
     if (msgContent.trim() !== "") {
-      socket.emit("sendMsg", {
-        msgType: "normal",
-        msgContent,
-        userInfo: userInfo,
-      });
+      sendMessage?.("normal", msgContent, userInfo);
       setMsgContent("");
     } else {
       console.log("message empty");
@@ -61,13 +55,8 @@ export default function PerfectLiveChat() {
   };
 
   const handleChooseGif = (item: { url: string } | null) => {
-    const gif = item ? { ...item } : null;
     if (item) {
-      socket.emit("sendMsg", {
-        msgType: "gif",
-        msgContent: gif?.url,
-        userInfo: userInfo,
-      });
+      sendMessage?.("gif", item.url, userInfo);
       setMsgContent("");
     } else {
       console.log("message empty");
@@ -79,39 +68,26 @@ export default function PerfectLiveChat() {
     setMsgContent(`${msgContent}${emoji.native}`);
   };
 
-  const getAllChats = async (flag: boolean) => {
-    let response: any = await axios.post(
-      `${
-        process.env.REACT_APP_DEVELOPMENT === "true"
-          ? config.development_api
-          : config.production_api
-      }/get-all-chat`,
+  const handleLikeChat = (chatItem: MsgUserType) => {
+    setMsgData((prev) =>
+      prev.map((item) =>
+        item._id === chatItem._id
+          ? {
+              ...item,
+              likes: item.likesIDs.includes(userInfo.userId)
+                ? item.likes
+                : item.likes + 1,
+              likesIDs: item.likesIDs.includes(userInfo.userId)
+                ? item.likesIDs
+                : [...item.likesIDs, userInfo.userId],
+            }
+          : item,
+      ),
     );
-    setMsgData(response?.data?.data || []);
-    if (flag === false) {
-      setMsgReceived(!msgReceived);
-    }
-  };
-
-  const handleLikeChat = async (chatItem: MsgUserType) => {
-    let response = await axios.post(
-      `${
-        process.env.REACT_APP_DEVELOPMENT === "true"
-          ? config.development_api
-          : config.production_api
-      }/like-chat`,
-      {
-        chatID: chatItem._id,
-        userId: userInfo.userId,
-      },
-    );
-    if (response?.data?.status) {
-      getAllChats(true);
-    }
   };
 
   useEffect(() => {
-    getAllChats(false);
+    setMsgData((prev) => prev || []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

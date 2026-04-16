@@ -15,8 +15,6 @@ import { RxAvatar } from "react-icons/rx";
 import copy from "copy-to-clipboard";
 
 import Context from "../../context";
-import axios from "axios";
-import config from "../../config.json";
 import ChatImg from "../../assets/images/chat.svg";
 import { displayName, generateRandomString } from "../utils";
 
@@ -115,25 +113,10 @@ const Menu = ({
         takeOffAudioEle.pause();
         flewAwayAudioEle.pause();
       }
-      try {
-        await axios.post(
-          `${
-            process.env.REACT_APP_DEVELOPMENT === "true"
-              ? config.development_api
-              : config.production_api
-          }/update-info`,
-          {
-            userId: userInfo.userId,
-            updateData: { isSoundEnable: checked },
-          },
-        );
-        updateUserInfo({
-          ...userInfo,
-          isSoundEnable: checked,
-        });
-      } catch (error) {
-        console.log("Failed to update Sound state");
-      }
+      updateUserInfo({
+        ...userInfo,
+        isSoundEnable: checked,
+      });
     },
     // eslint-disable-next-line
     [userInfo],
@@ -141,25 +124,10 @@ const Menu = ({
 
   const handleToggleMusic = useCallback(
     async (checked: boolean) => {
-      try {
-        await axios.post(
-          `${
-            process.env.REACT_APP_DEVELOPMENT === "true"
-              ? config.development_api
-              : config.production_api
-          }/update-info`,
-          {
-            userId: userInfo.userId,
-            updateData: { isMusicEnable: checked },
-          },
-        );
-        updateUserInfo({
-          ...userInfo,
-          isMusicEnable: checked,
-        });
-      } catch (error) {
-        console.log("Failed to update music state");
-      }
+      updateUserInfo({
+        ...userInfo,
+        isMusicEnable: checked,
+      });
     },
     // eslint-disable-next-line
     [userInfo],
@@ -179,24 +147,10 @@ const Menu = ({
   };
 
   const handleImgClick = async (avatar: string) => {
-    const response: any = await axios.post(
-      `${
-        process.env.REACT_APP_DEVELOPMENT === "true"
-          ? config.development_api
-          : config.production_api
-      }/update-info`,
-      {
-        userId: userInfo.userId,
-        updateData: { avatar },
-      },
-    );
-
-    if (response.data?.status) {
-      updateUserInfo({
-        ...userInfo,
-        avatar,
-      });
-    }
+    updateUserInfo({
+      ...userInfo,
+      avatar,
+    });
   };
 
   const toggleChangeAvatar = () => {

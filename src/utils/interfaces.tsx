@@ -1,5 +1,4 @@
 import { UnityContext } from "react-unity-webgl";
-import { Socket } from "socket.io-client";
 
 export interface BettedUserType {
   name: string;
@@ -9,6 +8,9 @@ export interface BettedUserType {
   target: number;
   avatar?: string;
   img: string;
+  __entryKey?: string;
+  __bot?: boolean;
+  __plannedCashoutAt?: number;
 }
 
 export interface BetResults {
@@ -28,6 +30,7 @@ export interface UserType {
   platform: string;
   token: string;
   Session_Token: string;
+  myBets: GameHistory[];
   isSoundEnable: boolean;
   isMusicEnable: boolean;
   msgVisible: boolean;
@@ -127,9 +130,7 @@ export interface ContextType
   extends GameBetLimit, UserStatusType, GameStatusType {
   state: ContextDataType;
   userInfo: UserType;
-  socket: Socket;
   msgData: MsgUserType[];
-  platformLoading: boolean;
   msgTab: boolean;
   errorBackend: boolean;
   unityState: boolean;
@@ -140,10 +141,8 @@ export interface ContextType
   previousHand: BettedUserType[];
   history: number[];
   rechargeState: boolean;
-  secure: boolean;
   msgReceived: boolean;
   myUnityContext: UnityContext;
-  userSeedText: string;
   currentTarget: number;
   fLoading: boolean;
   setFLoading(attrs: boolean): void;
@@ -155,7 +154,10 @@ export interface ContextType
   updateUserInfo(attrs: Partial<UserType>): void;
   getMyBets(): void;
   updateUserBetState(attrs: Partial<UserStatusType>): void;
-  setMsgData(attrs: MsgUserType[]): void;
+  setMsgData(
+    attrs: MsgUserType[] | ((prev: MsgUserType[]) => MsgUserType[]),
+  ): void;
+  sendMessage(msgType: string, msgContent: string, userInfo: UserType): void;
   handleGetSeed(): void;
   handleGetSeedOfRound(attrs: number): Promise<SeedDetailsType>;
   handlePlaceBet(): void;
@@ -184,6 +186,7 @@ export interface SeedDetailsType {
     userId: string;
   }>;
   flyDetailID: number;
+  target: number;
 }
 
 const unityBaseUrl = process.env.PUBLIC_URL
@@ -254,6 +257,7 @@ export const init_state = {
       betAmount: 20,
       target: 2,
     },
+    myBets: [],
   },
 } as ContextDataType;
 
@@ -291,4 +295,5 @@ export const init_userInfo = {
     betAmount: 20,
     target: 2,
   },
+  myBets: [],
 };
