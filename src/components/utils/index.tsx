@@ -13,14 +13,15 @@ export const displayName = (name: string) => {
   return name?.slice(0, 1) + "***" + name?.slice(-1);
 };
 
-export const binaryToFloat = (binary: string) => {
-  const [integerPart, fractionalPart] = binary.split('.');
+export const binaryToFloat = (binary: string | number) => {
+  const [integerPart, fractionalPart] = String(binary).split(".");
   let integerDecimal = parseInt(integerPart, 2);
   let fractionalDecimal = 0;
   if (fractionalPart) {
     for (let i = 0; i < fractionalPart.length; i++) {
-      fractionalDecimal += parseInt(fractionalPart[i], 2) * Math.pow(2, -(i + 1));
+      fractionalDecimal +=
+        parseInt(fractionalPart[i], 2) * Math.pow(2, -(i + 1));
     }
   }
   return Number(integerDecimal + fractionalDecimal);
-}
+};

@@ -1,13 +1,13 @@
 import React from "react";
 import Context from "../../context";
 import { displayName } from "../utils";
-import { BetResults, BettedUserType, UserType } from "../../utils/interfaces";
+import { BetResults, BettedUserType } from "../../utils/interfaces";
 import { binaryToFloat } from "../utils";
 
 interface AllDataProps {
   pre: boolean;
   setPre: React.Dispatch<React.SetStateAction<boolean>>;
-  allData: UserType[] | BettedUserType[];
+  allData: BettedUserType[];
 }
 
 const AllData = ({ pre, setPre, allData }: AllDataProps) => {
@@ -36,31 +36,26 @@ const AllData = ({ pre, setPre, allData }: AllDataProps) => {
             <div>{bettedUsers?.length}</div>
           </div>
           <div
-            className={`previous-hand items-center flex justify-between ${pre ? "click" : ""
-              }`}
+            className={`previous-hand items-center flex justify-between ${
+              pre ? "click" : ""
+            }`}
             onClick={() => {
               setPre(!pre);
             }}
           >
             <div className="history-i"></div>
-            <span
-              className="ml-1 "
-            >
-              Previous hand
-            </span>
+            <span className="ml-1 ">Previous hand</span>
           </div>
         </div>
         <div className="spacer"></div>
         <div className="legend all-data">
           <span className="user">User</span>
           <span className="bet">
-            Bet,{" "}
-            {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
+            Bet, {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
           </span>
           <span>X</span>
           <span className="cash-out">
-            Cash out,{" "}
-            {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
+            Cash out, {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
           </span>
         </div>
       </div>
@@ -68,7 +63,7 @@ const AllData = ({ pre, setPre, allData }: AllDataProps) => {
         <div className="cdk-virtual-scroll-content-wrapper">
           {allData?.map((user, key) => (
             <div
-              className={`bet-item ${user.cashouted ? "celebrated" : ""} ${user.name === userInfo.userName && 'border-green'}`}
+              className={`bet-item ${user.cashouted ? "celebrated" : ""} ${user.name === userInfo.userName && "border-green"}`}
               key={key}
             >
               <div className="user">
@@ -83,16 +78,19 @@ const AllData = ({ pre, setPre, allData }: AllDataProps) => {
                 )}
                 <div className="username">{displayName(user.name)}</div>
               </div>
-              <div className="bet">{binaryToFloat(user.betAmount).toFixed(2)}</div>
+              <div className="bet">
+                {binaryToFloat(user.betAmount).toFixed(2)}
+              </div>
               {user.cashouted && (
                 <div className="multiplier-block">
                   <div
-                    className={`bubble font-weight-bold opacity-${100 - 2 * key} ${binaryToFloat(user.target) < 2
-                      ? "blue"
-                      : binaryToFloat(user.target) < 10
-                        ? "purple"
-                        : "big"
-                      }`}
+                    className={`bubble font-weight-bold opacity-${100 - 2 * key} ${
+                      binaryToFloat(user.target) < 2
+                        ? "blue"
+                        : binaryToFloat(user.target) < 10
+                          ? "purple"
+                          : "big"
+                    }`}
                   >
                     {binaryToFloat(user.target).toFixed(2)}x
                   </div>

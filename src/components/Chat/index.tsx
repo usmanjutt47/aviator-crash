@@ -9,6 +9,7 @@ import Context from "../../context";
 import "./chat.scss";
 import config from "../../config.json";
 import { displayName } from "../utils";
+import { MsgUserType } from "../../utils/interfaces";
 
 export default function PerfectLiveChat() {
   const {
@@ -39,8 +40,12 @@ export default function PerfectLiveChat() {
   }, [msgTab, msgReceived]);
 
   const handleSendMsg = () => {
-    if (msgContent.trim() !== '') {
-      socket.emit("sendMsg", { msgType: "normal", msgContent, userInfo: userInfo });
+    if (msgContent.trim() !== "") {
+      socket.emit("sendMsg", {
+        msgType: "normal",
+        msgContent,
+        userInfo: userInfo,
+      });
       setMsgContent("");
     } else {
       console.log("message empty");
@@ -49,16 +54,20 @@ export default function PerfectLiveChat() {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevent new line in the textarea
       handleSendMsg();
     }
   };
 
-  const handleChooseGif = (item) => {
-    let gif: any = { ...item };
+  const handleChooseGif = (item: { url: string } | null) => {
+    const gif = item ? { ...item } : null;
     if (item) {
-      socket.emit("sendMsg", { msgType: "gif", msgContent: gif.url, userInfo: userInfo });
+      socket.emit("sendMsg", {
+        msgType: "gif",
+        msgContent: gif?.url,
+        userInfo: userInfo,
+      });
       setMsgContent("");
     } else {
       console.log("message empty");
@@ -66,16 +75,17 @@ export default function PerfectLiveChat() {
     setGifPicker(false);
   };
 
-  const handleEmojiSelect = (emoji) => {
+  const handleEmojiSelect = (emoji: { native: string }) => {
     setMsgContent(`${msgContent}${emoji.native}`);
   };
 
   const getAllChats = async (flag: boolean) => {
     let response: any = await axios.post(
-      `${process.env.REACT_APP_DEVELOPMENT === "true"
-        ? config.development_api
-        : config.production_api
-      }/get-all-chat`
+      `${
+        process.env.REACT_APP_DEVELOPMENT === "true"
+          ? config.development_api
+          : config.production_api
+      }/get-all-chat`,
     );
     setMsgData(response?.data?.data || []);
     if (flag === false) {
@@ -83,16 +93,17 @@ export default function PerfectLiveChat() {
     }
   };
 
-  const handleLikeChat = async (chatItem: any) => {
+  const handleLikeChat = async (chatItem: MsgUserType) => {
     let response = await axios.post(
-      `${process.env.REACT_APP_DEVELOPMENT === "true"
-        ? config.development_api
-        : config.production_api
+      `${
+        process.env.REACT_APP_DEVELOPMENT === "true"
+          ? config.development_api
+          : config.production_api
       }/like-chat`,
       {
         chatID: chatItem._id,
         userId: userInfo.userId,
-      }
+      },
     );
     if (response?.data?.status) {
       getAllChats(true);
@@ -132,7 +143,7 @@ export default function PerfectLiveChat() {
             >
               {msgData?.map((item, index) => {
                 let active = item?.likesIDs?.filter(
-                  (item) => item === userInfo.userId
+                  (item) => item === userInfo.userId,
                 ).length;
                 let userName = displayName(item.userName);
                 return (
@@ -164,7 +175,9 @@ export default function PerfectLiveChat() {
                               />
                             </div>
                           ) : (
-                            <span className="ng-star-inserted">{item.message}</span>
+                            <span className="ng-star-inserted">
+                              {item.message}
+                            </span>
                           )}
                         </span>
                       </div>
@@ -205,7 +218,9 @@ export default function PerfectLiveChat() {
                 emojiSize={20}
                 perLine={8}
                 data={data}
-                onEmojiSelect={(emoji) => handleEmojiSelect(emoji)}
+                onEmojiSelect={(emoji: { native: string }) =>
+                  handleEmojiSelect(emoji)
+                }
               />
             </div>
           )}
@@ -226,7 +241,7 @@ export default function PerfectLiveChat() {
                 height={320}
                 theme={Theme.DARK}
                 tenorApiKey={tenorApiKey}
-                onGifClick={(item) => handleChooseGif(item)}
+                onGifClick={(item: { url: string }) => handleChooseGif(item)}
               />
             </div>
           )}

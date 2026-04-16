@@ -70,13 +70,13 @@ export default function WebGLStarter() {
   }, [GameState]);
 
   React.useEffect(() => {
-    let myInterval;
+    let myInterval: ReturnType<typeof setInterval> | undefined;
     if (GameState === "PLAYING") {
       setFlag(2);
       let startTime = Date.now() - time;
       let currentTime;
       let currentNum;
-      const getCurrentTime = (e) => {
+      const getCurrentTime = (e: number) => {
         currentTime = (Date.now() - startTime) / 1000;
         currentNum =
           1 +
@@ -109,7 +109,11 @@ export default function WebGLStarter() {
         setWaiting(Date.now() - startWaiting);
       }, 20);
     }
-    return () => clearInterval(myInterval);
+    return () => {
+      if (myInterval) {
+        clearInterval(myInterval);
+      }
+    };
   }, [GameState, time, currentNum, setCurrentTarget]);
 
   React.useEffect(() => {

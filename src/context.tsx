@@ -61,8 +61,13 @@ let fDecreaseAmount = 0;
 let sIncreaseAmount = 0;
 let sDecreaseAmount = 0;
 
-let newState;
-let newBetState;
+let newState: ContextDataType = sharedInitState;
+let newBetState: UserStatusType = {
+  fbetState: false,
+  fbetted: false,
+  sbetState: false,
+  sbetted: false,
+};
 
 export const Provider = ({ children }: any) => {
   const token = new URLSearchParams(useLocation().search).get("cert");
@@ -101,7 +106,7 @@ export const Provider = ({ children }: any) => {
   const update = (attrs: Partial<ContextDataType>) => {
     setState({ ...state, ...attrs });
   };
-  const [previousHand, setPreviousHand] = React.useState<UserType[]>([]);
+  const [previousHand, setPreviousHand] = React.useState<BettedUserType[]>([]);
   const [history, setHistory] = React.useState<number[]>([]);
   const [userBetState, setUserBetState] = React.useState<UserStatusType>({
     fbetState: false,
@@ -243,7 +248,7 @@ export const Provider = ({ children }: any) => {
       setGameState(gameState);
     });
 
-    socket.on("previousHand", (previousHand: UserType[]) => {
+    socket.on("previousHand", (previousHand: BettedUserType[]) => {
       setPreviousHand(previousHand);
     });
 

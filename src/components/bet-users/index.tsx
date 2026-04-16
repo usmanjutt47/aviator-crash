@@ -5,16 +5,14 @@ import AllData from "./all-data";
 import MyBets from "./my-bets";
 import TopHistory from "./top-history";
 import Context from "../../context";
-import { BettedUserType, UserType } from "../../utils/interfaces";
+import { BettedUserType } from "../../utils/interfaces";
 
 export default function BetsUsers() {
   const { previousHand, bettedUsers, getMyBets } = React.useContext(Context);
   // const [state, , , getMyBets] = useCrashContext();
 
   const [headerType, setHeaderType] = React.useState("all");
-  const [allData, setAllData] = React.useState<UserType[] | BettedUserType[]>(
-    [],
-  );
+  const [allData, setAllData] = React.useState<BettedUserType[]>([]);
   const [pre, setPre] = React.useState(false);
 
   const header = [
@@ -23,7 +21,7 @@ export default function BetsUsers() {
     { type: "top", value: "Top" },
   ];
 
-  const getData = (e) => {
+  const getData = (e: string) => {
     if (e === "myBet") getMyBets();
   };
 

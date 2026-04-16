@@ -35,7 +35,13 @@ const settingItems: { label: string; handleType: string }[] = [
   },
 ];
 
-const Menu = ({ setHowto }) => {
+const Menu = ({
+  setHowto,
+}: {
+  setHowto: React.Dispatch<
+    React.SetStateAction<"howto" | "short" | "more" | "">
+  >;
+}) => {
   const {
     state,
     minBet,
@@ -57,7 +63,7 @@ const Menu = ({ setHowto }) => {
   const [changeSeed, setChangeSeed] = useState<boolean>(false);
   const [changeAvatar, setChangeAvatar] = useState<boolean>(false);
 
-  const [key,] = useState<string>(generateRandomString(20));
+  const [key] = useState<string>(generateRandomString(20));
   const [customKey, setCustomKey] = useState<string>(generateRandomString(20));
   const [imgNums, setImgNums] = useState<number[]>([]);
 
@@ -68,7 +74,7 @@ const Menu = ({ setHowto }) => {
     if (clientSeedType === 1) {
       handleChangeUserSeed(customKey);
     }
-  }, [clientSeedType, customKey, key])
+  }, [clientSeedType, customKey, key]);
 
   /**
    * Toggle the drop down menu
@@ -102,7 +108,7 @@ const Menu = ({ setHowto }) => {
   };
 
   const handleToggleSound = useCallback(
-    async (checked) => {
+    async (checked: boolean) => {
       let takeOffAudioEle: any = document.getElementById("takeOffAudio");
       let flewAwayAudioEle: any = document.getElementById("flewAwayAudio");
       if (checked === false) {
@@ -111,52 +117,52 @@ const Menu = ({ setHowto }) => {
       }
       try {
         await axios.post(
-          `${process.env.REACT_APP_DEVELOPMENT === "true"
-            ? config.development_api
-            : config.production_api
+          `${
+            process.env.REACT_APP_DEVELOPMENT === "true"
+              ? config.development_api
+              : config.production_api
           }/update-info`,
           {
             userId: userInfo.userId,
             updateData: { isSoundEnable: checked },
-          }
+          },
         );
         updateUserInfo({
           ...userInfo,
           isSoundEnable: checked,
-        },
-        );
+        });
       } catch (error) {
         console.log("Failed to update Sound state");
       }
     },
     // eslint-disable-next-line
-    [userInfo]
+    [userInfo],
   );
 
   const handleToggleMusic = useCallback(
-    async (checked) => {
+    async (checked: boolean) => {
       try {
         await axios.post(
-          `${process.env.REACT_APP_DEVELOPMENT === "true"
-            ? config.development_api
-            : config.production_api
+          `${
+            process.env.REACT_APP_DEVELOPMENT === "true"
+              ? config.development_api
+              : config.production_api
           }/update-info`,
           {
             userId: userInfo.userId,
             updateData: { isMusicEnable: checked },
-          }
+          },
         );
         updateUserInfo({
           ...userInfo,
           isMusicEnable: checked,
-        },
-        );
+        });
       } catch (error) {
         console.log("Failed to update music state");
       }
     },
     // eslint-disable-next-line
-    [userInfo]
+    [userInfo],
   );
 
   const handleOpenSettings = (type: string) => {
@@ -174,22 +180,22 @@ const Menu = ({ setHowto }) => {
 
   const handleImgClick = async (avatar: string) => {
     const response: any = await axios.post(
-      `${process.env.REACT_APP_DEVELOPMENT === "true"
-        ? config.development_api
-        : config.production_api
+      `${
+        process.env.REACT_APP_DEVELOPMENT === "true"
+          ? config.development_api
+          : config.production_api
       }/update-info`,
       {
         userId: userInfo.userId,
         updateData: { avatar },
-      }
+      },
     );
 
     if (response.data?.status) {
       updateUserInfo({
         ...userInfo,
         avatar,
-      },
-      );
+      });
     }
   };
 
@@ -267,16 +273,15 @@ const Menu = ({ setHowto }) => {
                   <div className="avatar">
                     <img
                       className="avatar"
-                      src={`${userInfo?.avatar
-                        ? userInfo?.avatar
-                        : "./avatars/av-5.png"
-                        }`}
+                      src={`${
+                        userInfo?.avatar
+                          ? userInfo?.avatar
+                          : "./avatars/av-5.png"
+                      }`}
                       alt="avatar"
                     />
                   </div>
-                  <div className="name">
-                    {displayName(userInfo?.userName)}
-                  </div>
+                  <div className="name">{displayName(userInfo?.userName)}</div>
                 </div>
                 <div
                   className="avatar-change"
@@ -379,8 +384,9 @@ const Menu = ({ setHowto }) => {
                     and first 3 bets of the round.
                   </div>
                   <div
-                    className={`client-seed-custom ${clientSeedType === 1 && "block-key"
-                      }`}
+                    className={`client-seed-custom ${
+                      clientSeedType === 1 && "block-key"
+                    }`}
                   >
                     <div
                       className="label"
@@ -414,8 +420,9 @@ const Menu = ({ setHowto }) => {
                     </div>
                   </div>
                   <div
-                    className={`client-seed-custom ${clientSeedType === 0 && "block-key"
-                      }`}
+                    className={`client-seed-custom ${
+                      clientSeedType === 0 && "block-key"
+                    }`}
                   >
                     <div
                       className="label"
@@ -610,8 +617,9 @@ const Menu = ({ setHowto }) => {
                           onClick={() => handleImgClick(imgURL)}
                         >
                           <img
-                            className={`game-img mr-2 mb-2 ng-star-inserted ${flag ? "active" : ""
-                              }`}
+                            className={`game-img mr-2 mb-2 ng-star-inserted ${
+                              flag ? "active" : ""
+                            }`}
                             src={imgURL}
                             alt={imgURL}
                           />

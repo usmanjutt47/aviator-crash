@@ -10,36 +10,38 @@ const MyBets = () => {
 
   const [modalParam, setModalParam] = useState({
     modalState: false,
-    flyDetailId: ''
+    flyDetailId: "" as string | number,
   });
 
-  const handleGetSeed = async (flyDetailId) => {
+  const handleGetSeed = async (flyDetailId: number | string) => {
     setModalParam({
       modalState: true,
-      flyDetailId
+      flyDetailId,
     });
-  }
+  };
 
   const displayDate = (num: number) => {
-    let displayData = '';
+    let displayData = "";
 
     if (num === 0) {
-      displayData = '00';
+      displayData = "00";
     } else if (num < 10) {
-      displayData = `0${num}`
+      displayData = `0${num}`;
     } else {
       displayData = `${num}`;
     }
 
     return displayData;
-  }
+  };
 
   return (
     <>
       <div className="legend px-2 d-flex align-items-center w-100">
         <div className="date">Date</div>
         <div className="d-flex w-100">
-          <span className="bet">Bet, {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}</span>
+          <span className="bet">
+            Bet, {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
+          </span>
           <span>X</span>
           <span className="cash-out">
             Cash out, {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
@@ -52,8 +54,9 @@ const MyBets = () => {
           {state &&
             state.myBets.map((user, key) => (
               <div
-                className={`bet-item pr-2 ${user.cashouted ? "celebrated" : ""
-                  }`}
+                className={`bet-item pr-2 ${
+                  user.cashouted ? "celebrated" : ""
+                }`}
                 key={key}
               >
                 <div className="date">
@@ -63,22 +66,21 @@ const MyBets = () => {
                 {user.cashouted ? (
                   <div className="multiplier-block">
                     <div
-                      className={`bubble ${user.cashouted && "font-weight-bold"} opacity-${100 - 2 * key} ${Number(user.cashoutAt) < 2
-                        ? "blue"
-                        : Number(user.cashoutAt) < 10
-                          ? "purple"
-                          : "big"
-                        }`}
+                      className={`bubble ${user.cashouted && "font-weight-bold"} opacity-${100 - 2 * key} ${
+                        Number(user.cashoutAt) < 2
+                          ? "blue"
+                          : Number(user.cashoutAt) < 10
+                            ? "purple"
+                            : "big"
+                      }`}
                     >
                       {Number(user.cashoutAt).toFixed(2)}x
                     </div>
                   </div>
                 ) : (
                   <div className="multiplier-block">
-                    <div
-                      className={`bubble opacity-${100 - 2 * key}}`}
-                    >
-                      {(user.flyAway).toFixed(2)}x
+                    <div className={`bubble opacity-${100 - 2 * key}}`}>
+                      {user.flyAway.toFixed(2)}x
                     </div>
                   </div>
                 )}
@@ -88,15 +90,26 @@ const MyBets = () => {
                     : ""}
                 </div>
                 <div className="tools">
-                  <div onClick={() => handleGetSeed(user.flyDetailID)} className="fairness-i"></div>
-                  <div className="share-i" onClick={() => { copy(`${user.flyDetailID}`); toast.success('Copied for Fly ID!') }}></div>
+                  <div
+                    onClick={() => handleGetSeed(user.flyDetailID)}
+                    className="fairness-i"
+                  ></div>
+                  <div
+                    className="share-i"
+                    onClick={() => {
+                      copy(`${user.flyDetailID}`);
+                      toast.success("Copied for Fly ID!");
+                    }}
+                  ></div>
                 </div>
               </div>
             ))}
         </div>
       </div>
 
-      {modalParam.modalState && <SeedModal setModal={setModalParam} modalParam={modalParam} />}
+      {modalParam.modalState && (
+        <SeedModal setModal={setModalParam} modalParam={modalParam} />
+      )}
     </>
   );
 };
