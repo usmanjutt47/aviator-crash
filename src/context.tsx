@@ -79,6 +79,10 @@ export const Provider = ({ children }: any) => {
     React.useState<UserType>(init_userInfo);
   const [fLoading, setFLoading] = React.useState<boolean>(false);
   const [sLoading, setSLoading] = React.useState<boolean>(false);
+  const hasConnectedRef = React.useRef(false);
+  const disconnectTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   newState = state;
   const [unity, setUnity] = React.useState({
@@ -161,32 +165,53 @@ export const Provider = ({ children }: any) => {
   }, []);
 
   React.useEffect(() => {
+    const clearDisconnectTimer = () => {
+      if (disconnectTimerRef.current) {
+        clearTimeout(disconnectTimerRef.current);
+        disconnectTimerRef.current = null;
+      }
+    };
+
+    const scheduleDisconnectAlert = () => {
+      if (!hasConnectedRef.current || disconnectTimerRef.current) {
+        return;
+      }
+      disconnectTimerRef.current = setTimeout(() => {
+        setErrorBackend(true);
+        disconnectTimerRef.current = null;
+      }, 2000);
+    };
+
     // Socket connection event handlers
     socket.on("connect", () => {
       console.log("✅ Connected to backend server");
+      hasConnectedRef.current = true;
+      clearDisconnectTimer();
       setErrorBackend(false);
       socket.emit("enterRoom", { token });
     });
 
     socket.on("disconnect", () => {
       console.log("❌ Disconnected from backend server");
-      setErrorBackend(true);
+      scheduleDisconnectAlert();
     });
 
     socket.on("connect_error", (error) => {
       console.error("🔴 Connection error:", error);
-      setErrorBackend(true);
+      scheduleDisconnectAlert();
     });
 
     socket.on("reconnect", () => {
       console.log("🔄 Reconnected to backend server");
+      hasConnectedRef.current = true;
+      clearDisconnectTimer();
       setErrorBackend(false);
       socket.emit("enterRoom", { token });
     });
 
     socket.on("reconnect_error", (error) => {
       console.error("🔴 Reconnect error:", error);
-      setErrorBackend(true);
+      scheduleDisconnectAlert();
     });
 
     socket.on("bettedUserInfo", (bettedUsers: BettedUserType[]) => {
@@ -322,6 +347,7 @@ export const Provider = ({ children }: any) => {
       toast.success(data);
     });
     return () => {
+      clearDisconnectTimer();
       socket.off("connect");
       socket.off("disconnect");
       socket.off("connect_error");
