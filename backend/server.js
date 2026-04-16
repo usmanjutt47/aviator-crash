@@ -92,7 +92,7 @@ function createUser(key) {
     userType: false,
     avatar: "/avatars/av-5.png",
     userId: key,
-    currency: "INR",
+    currency: "PKR",
     userName: randomName(),
     ipAddress: "127.0.0.1",
     platform: "web",

@@ -115,7 +115,7 @@ const TopHistory = () => {
                             Bet,{" "}
                             {`${userInfo?.currency
                                 ? userInfo?.currency
-                                : "INR"
+                                : "PKR"
                               }`}
                             :&nbsp;
                           </span>
@@ -149,7 +149,7 @@ const TopHistory = () => {
                             Win,{" "}
                             {`${userInfo?.currency
                                 ? userInfo?.currency
-                                : "INR"
+                                : "PKR"
                               }`}
                             : &nbsp;
                           </span>

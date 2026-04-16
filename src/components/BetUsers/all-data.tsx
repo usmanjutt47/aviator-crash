@@ -55,12 +55,12 @@ const AllData = ({ pre, setPre, allData }: AllDataProps) => {
           <span className="user">User</span>
           <span className="bet">
             Bet,{" "}
-            {`${userInfo?.currency ? userInfo?.currency : "INR"}`}
+            {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
           </span>
           <span>X</span>
           <span className="cash-out">
             Cash out,{" "}
-            {`${userInfo?.currency ? userInfo?.currency : "INR"}`}
+            {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
           </span>
         </div>
       </div>

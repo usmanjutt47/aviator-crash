@@ -38,7 +38,7 @@ export default function Header() {
           <div className="d-flex">
             <div className="balance">
               <span className="amount">{Number(userInfo.balance).toFixed(2)} </span>
-              <span className="currency">&nbsp;INR</span>
+              <span className="currency">&nbsp;PKR</span>
             </div>
           </div>
         </div>

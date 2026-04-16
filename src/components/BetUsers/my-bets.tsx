@@ -39,10 +39,10 @@ const MyBets = () => {
       <div className="legend px-2 d-flex align-items-center w-100">
         <div className="date">Date</div>
         <div className="d-flex w-100">
-          <span className="bet">Bet, {`${userInfo?.currency ? userInfo?.currency : "INR"}`}</span>
+          <span className="bet">Bet, {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}</span>
           <span>X</span>
           <span className="cash-out">
-            Cash out, {`${userInfo?.currency ? userInfo?.currency : "INR"}`}
+            Cash out, {`${userInfo?.currency ? userInfo?.currency : "PKR"}`}
           </span>
         </div>
         <div className="tools h-100"></div>

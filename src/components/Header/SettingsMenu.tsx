@@ -552,7 +552,7 @@ const Menu = ({ setHowto }) => {
                   <li className="list-group-item pl-2 pr-1">
                     <div>
                       <span>Minimum bet</span>
-                      <span>(INR):</span>
+                      <span>(PKR):</span>
                     </div>
                     <span className="badge badge-success px-2 font-weight-normal">
                       {minBet}
@@ -561,7 +561,7 @@ const Menu = ({ setHowto }) => {
                   <li className="list-group-item pl-2 pr-1">
                     <div>
                       <span>Maximum bet</span>
-                      <span>(INR):</span>
+                      <span>(PKR):</span>
                     </div>
                     <span className="badge badge-success px-2 font-weight-normal">
                       {maxBet}
@@ -570,7 +570,7 @@ const Menu = ({ setHowto }) => {
                   <li className="list-group-item pl-2 pr-1">
                     <div>
                       <span>Maximum win for one bet</span>
-                      <span>(INR):</span>
+                      <span>(PKR):</span>
                     </div>
                     <span className="badge badge-success px-2 font-weight-normal">
                       8000000
