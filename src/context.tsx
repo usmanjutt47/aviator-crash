@@ -31,12 +31,23 @@ export interface PlayerType {
 
 const Context = React.createContext<ContextType>(null!);
 
-const socketEndpoint =
-  config.wss ||
-  process.env.REACT_APP_API_URL ||
-  (typeof window !== "undefined"
-    ? window.location.origin
-    : "http://localhost:5001");
+const socketEndpoint = (() => {
+  if (typeof window === "undefined") return "http://localhost:5001";
+
+  // For development mode on localhost, use localhost backend
+  if (config.development && window.location.hostname === "localhost") {
+    return config.wss || "http://localhost:5001";
+  }
+
+  // For production or any non-localhost, use current origin + /api fallback
+  // This ensures cross-device sharing works (everyone connects to same Vercel domain)
+  if (config.wss && !config.development) {
+    return config.wss;
+  }
+
+  // Fallback: use window.location.origin (works for all deployed instances)
+  return window.location.origin;
+})();
 
 const socket: Socket = io(socketEndpoint, {
   transports: ["websocket", "polling"],
