@@ -1,5 +1,5 @@
 {
-  "development": true,
+  "development": false,
   "debug": true,
   "appKey": "crash-0.1.0",
   "production_api": "https://domain.crash.games/api",
