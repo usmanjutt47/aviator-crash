@@ -1,7 +1,6 @@
 import {
   BettedUserType,
   GameHistory,
-  GameStatusType,
   GameBetLimit,
   MsgUserType,
   SeedDetailsType,

@@ -1,8 +1,8 @@
 packages:
-  - '.'
-  - 'backend'
+  - "."
+  - "backend"
 
 allowBuilds:
-  '@parcel/watcher': true
+  "@parcel/watcher": true
   core-js: true
   core-js-pure: true

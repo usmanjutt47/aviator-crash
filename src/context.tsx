@@ -6,7 +6,6 @@ import { LocalGameEngine } from "./utils/localGameEngine";
 import {
   UserType,
   BettedUserType,
-  GameHistory,
   ContextType,
   ContextDataType,
   MsgUserType,
@@ -150,16 +149,6 @@ export const Provider = ({ children }: any) => {
         clearTimeout(disconnectTimerRef.current);
         disconnectTimerRef.current = null;
       }
-    };
-
-    const scheduleDisconnectAlert = () => {
-      if (!hasConnectedRef.current || disconnectTimerRef.current) {
-        return;
-      }
-      disconnectTimerRef.current = setTimeout(() => {
-        setErrorBackend(true);
-        disconnectTimerRef.current = null;
-      }, 2000);
     };
 
     const handleConnect = () => {
