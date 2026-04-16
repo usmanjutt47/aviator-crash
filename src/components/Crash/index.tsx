@@ -114,7 +114,7 @@ export default function WebGLStarter() {
         clearInterval(myInterval);
       }
     };
-  }, [GameState, time, currentNum, setCurrentTarget]);
+  }, [GameState, time, setCurrentTarget]);
 
   React.useEffect(() => {
     myUnityContext?.send(
