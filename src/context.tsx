@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
-import { UnityContext } from "react-unity-webgl";
 import { useLocation } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { toast } from "react-toastify";
@@ -15,7 +14,6 @@ import {
   GameBetLimit,
   UserStatusType,
   GameStatusType,
-  LoadingType,
   SeedDetailsType,
   unityContext as sharedUnityContext,
   init_state as sharedInitState,
@@ -76,12 +74,11 @@ export const Provider = ({ children }: any) => {
   const [msgData, setMsgData] = React.useState<MsgUserType[]>([]);
   const [msgTab, setMsgTab] = React.useState<boolean>(false);
   const [msgReceived, setMsgReceived] = React.useState<boolean>(false);
-  const [platformLoading, setPlatformLoading] = React.useState<boolean>(false);
+  const [platformLoading] = React.useState<boolean>(false);
   const [errorBackend, setErrorBackend] = React.useState<boolean>(false);
-  const [secure, setSecure] = React.useState<boolean>(false);
-  const [userSeedText, setUserSeedText] = React.useState<string>("");
-  const [globalUserInfo, setGlobalUserInfo] =
-    React.useState<UserType>(init_userInfo);
+  const [secure] = React.useState<boolean>(false);
+  const [userSeedText] = React.useState<string>("");
+  const [globalUserInfo] = React.useState<UserType>(init_userInfo);
   const [fLoading, setFLoading] = React.useState<boolean>(false);
   const [sLoading, setSLoading] = React.useState<boolean>(false);
   const hasConnectedRef = React.useRef(false);
