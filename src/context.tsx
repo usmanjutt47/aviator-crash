@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import { UnityContext } from "react-unity-webgl";
-import { useLocation } from "react-router";
+import { useLocation } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { toast } from "react-toastify";
 import { config } from "./config";
@@ -33,11 +33,22 @@ export interface PlayerType {
 
 const Context = React.createContext<ContextType>(null!);
 
-const socket: Socket = io(process.env.REACT_APP_API_URL || "http://localhost:5000", {
-  transports: ['websocket', 'polling'],
+const socketEndpoint =
+  config.wss ||
+  process.env.REACT_APP_API_URL ||
+  (typeof window !== "undefined"
+    ? window.location.origin
+    : "http://localhost:5001");
+
+const socket: Socket = io(socketEndpoint, {
+  transports: ["websocket", "polling"],
   autoConnect: true,
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
   timeout: 20000,
-  forceNew: false
+  forceNew: false,
 });
 
 export const callCashOut = (at: number, index: "f" | "s") => {
@@ -64,13 +75,14 @@ export const Provider = ({ children }: any) => {
   const [errorBackend, setErrorBackend] = React.useState<boolean>(false);
   const [secure, setSecure] = React.useState<boolean>(false);
   const [userSeedText, setUserSeedText] = React.useState<string>("");
-  const [globalUserInfo, setGlobalUserInfo] = React.useState<UserType>(init_userInfo);
+  const [globalUserInfo, setGlobalUserInfo] =
+    React.useState<UserType>(init_userInfo);
   const [fLoading, setFLoading] = React.useState<boolean>(false);
   const [sLoading, setSLoading] = React.useState<boolean>(false);
 
   newState = state;
   const [unity, setUnity] = React.useState({
-    unityState: false,
+    unityState: true,
     unityLoading: false,
     currentProgress: 0,
   });
@@ -141,7 +153,7 @@ export const Provider = ({ children }: any) => {
       if (progression === 1) {
         setUnity({ currentProgress, unityLoading: true, unityState: true });
       } else {
-        setUnity({ currentProgress, unityLoading: false, unityState: false });
+        setUnity({ currentProgress, unityLoading: false, unityState: true });
       }
     });
 
@@ -163,6 +175,17 @@ export const Provider = ({ children }: any) => {
 
     socket.on("connect_error", (error) => {
       console.error("🔴 Connection error:", error);
+      setErrorBackend(true);
+    });
+
+    socket.on("reconnect", () => {
+      console.log("🔄 Reconnected to backend server");
+      setErrorBackend(false);
+      socket.emit("enterRoom", { token });
+    });
+
+    socket.on("reconnect_error", (error) => {
+      console.error("🔴 Reconnect error:", error);
       setErrorBackend(true);
     });
 
@@ -301,6 +324,10 @@ export const Provider = ({ children }: any) => {
     return () => {
       socket.off("connect");
       socket.off("disconnect");
+      socket.off("connect_error");
+      socket.off("reconnect");
+      socket.off("reconnect_error");
+      socket.off("bettedUserInfo");
       socket.off("myBetState");
       socket.off("myInfo");
       socket.off("history");
@@ -312,7 +339,7 @@ export const Provider = ({ children }: any) => {
       socket.off("error");
       socket.off("success");
     };
-  }, [socket]);
+  }, [token]);
 
   React.useEffect(() => {
     let attrs = state;
@@ -407,37 +434,43 @@ export const Provider = ({ children }: any) => {
   const updateUserInfo = (attrs: Partial<UserType>) => {
     setUserInfo((prev) => ({ ...prev, ...attrs }));
   };
-  const handleGetSeed = () => {/* implement or stub */};
+  const handleGetSeed = () => {
+    /* implement or stub */
+  };
   const handleGetSeedOfRound = async (id: number): Promise<SeedDetailsType> => {
     try {
       const response = await fetch(`${config.api}/game/seed/${id}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userInfo.token}`
-        }
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
+        },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         return data;
       } else {
-        throw new Error('Failed to fetch seed details');
+        throw new Error("Failed to fetch seed details");
       }
     } catch (error) {
-      console.error('Error fetching seed details:', error);
+      console.error("Error fetching seed details:", error);
       // Return default data structure to prevent errors
       return {
         createdAt: new Date().toISOString(),
-        serverSeed: '',
+        serverSeed: "",
         seedOfUsers: [],
-        flyDetailID: id
+        flyDetailID: id,
       };
     }
   };
-  const handlePlaceBet = () => {/* implement or stub */};
+  const handlePlaceBet = () => {
+    /* implement or stub */
+  };
   const toggleMsgTab = () => setMsgTab((prev) => !prev);
-  const handleChangeUserSeed = (seed: string) => {/* implement or stub */};
+  const handleChangeUserSeed = (seed: string) => {
+    /* implement or stub */
+  };
 
   return (
     <Context.Provider
