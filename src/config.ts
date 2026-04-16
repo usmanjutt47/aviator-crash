@@ -13,7 +13,9 @@ const toSocketUrl = (value: string) => {
 };
 
 const envApiBase = process.env.REACT_APP_API_URL?.trim();
+const envWssBase = process.env.REACT_APP_WSS_URL?.trim();
 const hasEnvApi = Boolean(envApiBase);
+const hasEnvWss = Boolean(envWssBase);
 
 const fallbackApiBase = appConfig.development
   ? appConfig.development_api
@@ -29,11 +31,13 @@ const isLocalHostRuntime =
   ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
 const resolvedApiBase = hasEnvApi ? envApiBase! : fallbackApiBase;
-const resolvedSocketBase = hasEnvApi
-  ? envApiBase!
-  : isLocalHostRuntime && appConfig.development
-    ? localSocketBase
-    : fallbackSocketBase;
+const resolvedSocketBase = hasEnvWss
+  ? envWssBase!
+  : hasEnvApi
+    ? envApiBase!
+    : isLocalHostRuntime && appConfig.development
+      ? localSocketBase
+      : fallbackSocketBase;
 
 export const config = {
   development: appConfig.development,
