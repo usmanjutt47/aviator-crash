@@ -4,15 +4,70 @@ import React from "react";
 import "./crash.scss";
 import Unity from "react-unity-webgl";
 import Context from "../../context";
+import takeOffSound from "../../assets/audio/take_off.mp3";
+import flewAwaySound from "../../assets/audio/flew_away.mp3";
 
 let currentFlag = 0;
 
 export default function WebGLStarter() {
   const { GameState, currentNum, time, myUnityContext, setCurrentTarget } =
     React.useContext(Context);
+  const previousGameStateRef = React.useRef<string>("");
+  const audioUnlockedRef = React.useRef<boolean>(false);
+  const takeOffAudioRef = React.useRef<HTMLAudioElement | null>(null);
+  const flewAwayAudioRef = React.useRef<HTMLAudioElement | null>(null);
   const [target, setTarget] = React.useState(1);
   const [waiting, setWaiting] = React.useState(0);
   const [flag, setFlag] = React.useState(1);
+
+  React.useEffect(() => {
+    takeOffAudioRef.current = new Audio(takeOffSound);
+    flewAwayAudioRef.current = new Audio(flewAwaySound);
+    takeOffAudioRef.current.preload = "auto";
+    flewAwayAudioRef.current.preload = "auto";
+    takeOffAudioRef.current.volume = 0.5;
+    flewAwayAudioRef.current.volume = 0.6;
+
+    const unlockAudio = () => {
+      audioUnlockedRef.current = true;
+    };
+
+    window.addEventListener("pointerdown", unlockAudio, { once: true });
+    window.addEventListener("keydown", unlockAudio, { once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudio);
+      window.removeEventListener("keydown", unlockAudio);
+      takeOffAudioRef.current?.pause();
+      flewAwayAudioRef.current?.pause();
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const prevState = previousGameStateRef.current;
+
+    const playAudio = (audio: HTMLAudioElement | null) => {
+      if (!audio || !audioUnlockedRef.current) {
+        return;
+      }
+      audio.currentTime = 0;
+      audio.play().catch(() => {
+        // Ignore blocked autoplay errors and retry on next user interaction.
+      });
+    };
+
+    if (GameState === "PLAYING" && prevState !== "PLAYING") {
+      flewAwayAudioRef.current?.pause();
+      playAudio(takeOffAudioRef.current);
+    }
+
+    if (GameState === "GAMEEND" && prevState !== "GAMEEND") {
+      takeOffAudioRef.current?.pause();
+      playAudio(flewAwayAudioRef.current);
+    }
+
+    previousGameStateRef.current = GameState;
+  }, [GameState]);
 
   React.useEffect(() => {
     let myInterval;
