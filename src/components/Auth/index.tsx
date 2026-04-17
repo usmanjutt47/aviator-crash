@@ -9,6 +9,7 @@ type AuthMode = "login" | "signup";
 
 interface StoredUser {
   userName: string;
+  email: string;
   password: string;
   avatar: string;
   balance: number;
@@ -36,6 +37,7 @@ function saveStoredAccounts(accounts: StoredUser[]) {
 function AuthScreen({ onAuthenticate }: AuthScreenProps) {
   const [mode, setMode] = React.useState<AuthMode>("login");
   const [username, setUsername] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [error, setError] = React.useState<string>("");
@@ -44,6 +46,7 @@ function AuthScreen({ onAuthenticate }: AuthScreenProps) {
 
   const resetForm = () => {
     setUsername("");
+    setEmail("");
     setPassword("");
     setConfirmPassword("");
     setError("");
@@ -53,6 +56,7 @@ function AuthScreen({ onAuthenticate }: AuthScreenProps) {
     const authUser = {
       userId: "me",
       userName: user.userName,
+      email: user.email,
       avatar: user.avatar,
       balance: user.balance,
       currency: user.currency,
@@ -121,6 +125,10 @@ function AuthScreen({ onAuthenticate }: AuthScreenProps) {
       setError("Username must be at least 3 characters.");
       return;
     }
+    if (!email.trim()) {
+      setError("Email is required.");
+      return;
+    }
     if (password.length < 4) {
       setError("Password must be at least 4 characters.");
       return;
@@ -139,6 +147,7 @@ function AuthScreen({ onAuthenticate }: AuthScreenProps) {
 
     const newUser: StoredUser = {
       userName: trimmedName,
+      email: email.trim(),
       password,
       avatar: "/avatars/av-5.png",
       balance: 0,
@@ -172,6 +181,17 @@ function AuthScreen({ onAuthenticate }: AuthScreenProps) {
               placeholder="Enter username"
             />
           </label>
+          {mode === "signup" && (
+            <label>
+              Email
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="Enter email"
+              />
+            </label>
+          )}
           <label>
             Password
             <input
