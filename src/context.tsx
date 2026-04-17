@@ -99,7 +99,6 @@ export const Provider = ({ children }: any) => {
     minBet: 1,
   });
   React.useEffect(function () {
-    // Unity loading event handlers
     sharedUnityContext.on("loaded", () => {
       console.log("✅ Unity WebGL loaded successfully");
       setUnity({
@@ -359,7 +358,6 @@ export const Provider = ({ children }: any) => {
         engine.playBet(data);
         betStatus.fbetState = false;
         betStatus.fbetted = true;
-        // update(attrs);
         setUserBetState(betStatus);
       }
       if (betStatus.sbetState) {
@@ -390,7 +388,6 @@ export const Provider = ({ children }: any) => {
         engine.playBet(data);
         betStatus.sbetState = false;
         betStatus.sbetted = true;
-        // update(attrs);
         setUserBetState(betStatus);
       }
     }
@@ -421,9 +418,7 @@ export const Provider = ({ children }: any) => {
   const handleGetSeedOfRound = async (id: number): Promise<SeedDetailsType> => {
     return engine.getSeedOfRound(id);
   };
-  const handlePlaceBet = () => {
-    // This app now uses the local engine for bets.
-  };
+  const handlePlaceBet = () => {};
   const toggleMsgTab = () => setMsgTab((prev) => !prev);
   const handleChangeUserSeed = (seed: string) => {
     update({ seed });
@@ -438,7 +433,7 @@ export const Provider = ({ children }: any) => {
         ...userBetState,
         ...betLimit,
         userInfo,
-        state, // add state for consumers expecting state
+        state,
         msgData,
         msgTab,
         msgReceived,
