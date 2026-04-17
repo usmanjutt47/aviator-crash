@@ -211,20 +211,45 @@ code {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: linear-gradient(
-    180deg,
-    rgba(8, 8, 16, 0.96),
-    rgba(10, 10, 26, 0.98)
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(79, 70, 229, 0.18),
+      transparent 20%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(56, 189, 248, 0.16),
+      transparent 18%
+    ),
+    linear-gradient(180deg, rgba(8, 8, 16, 1), rgba(10, 10, 26, 0.98));
+}
+
+.auth-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 70px
   );
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .auth-card {
   width: min(460px, 100%);
-  background: rgba(12, 12, 30, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(12, 12, 30, 0.88);
+  border: 1px solid rgba(99, 102, 241, 0.18);
   border-radius: 24px;
   padding: 32px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(18px);
 }
 
 .auth-card h2 {
@@ -301,21 +326,45 @@ code {
 
 .home-screen {
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #05060f 0%, #081021 45%, #08131d 100%);
+}
+
+.home-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background:
     radial-gradient(
-      circle at top left,
-      rgba(56, 189, 248, 0.16),
-      transparent 26%
+      circle at 16% 18%,
+      rgba(56, 189, 248, 0.22),
+      transparent 22%
     ),
     radial-gradient(
-      circle at top right,
-      rgba(168, 85, 247, 0.14),
-      transparent 24%
+      circle at 84% 12%,
+      rgba(168, 85, 247, 0.18),
+      transparent 20%
     ),
-    linear-gradient(180deg, rgba(8, 8, 16, 1), rgba(7, 13, 35, 1));
+    radial-gradient(
+      circle at 50% 72%,
+      rgba(236, 72, 153, 0.12),
+      transparent 18%
+    ),
+    repeating-linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 80px
+    );
+  opacity: 0.75;
+  pointer-events: none;
 }
 
 .home-shell {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -359,6 +408,24 @@ code {
 
 .home-logout-button:hover {
   background: rgba(248, 113, 113, 0.24);
+  transform: translateY(-1px);
+}
+
+.home-back-button {
+  margin-left: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.home-back-button:hover {
+  background: rgba(255, 255, 255, 0.16);
   transform: translateY(-1px);
 }
 
@@ -451,11 +518,12 @@ code {
 
 .wallet-panel {
   grid-column: 1 / -1;
-  background: rgba(7, 11, 28, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 28px;
-  padding: 24px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.21);
+  background: rgba(8, 11, 28, 0.84);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 32px;
+  padding: 28px;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
 }
 
 .deposit-plans-grid {
