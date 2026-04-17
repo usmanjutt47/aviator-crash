@@ -220,16 +220,11 @@ export default function WebGLStarter() {
             {Number(target).toFixed(2)}x
           </div>
         )}
-        <div
-          className={`multiplier ${GameState !== "BET" ? "show" : ""} ${GameState === "GAMEEND" ? "crashed" : ""}`}
-        >
-          {GameState === "BET"
-            ? ""
-            : target - 0.01 >= 1
-              ? Number(target - 0.01).toFixed(2)
-              : "1.00"}
-          x
-        </div>
+        {GameState === "PLAYING" && (
+          <div className={`multiplier show`}>
+            {target - 0.01 >= 1 ? Number(target - 0.01).toFixed(2) : "1.00"}x
+          </div>
+        )}
         <div className={`center-logo ${showLogo ? "" : "hide"}`} id="ufcLogo">
           <img
             src="https://i.ibb.co.com/wZ5ZQgts/unnamed-2-removebg-preview.png"
