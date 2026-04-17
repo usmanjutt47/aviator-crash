@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
 import { LocalGameEngine } from "./utils/localGameEngine";
 import {
   UserType,
@@ -281,11 +280,12 @@ export const Provider = ({ children }: any) => {
         ...prev,
         [`${data.index}betted`]: false,
       }));
-      toast.error(data.message);
     };
 
     const handleSuccess = (data: any) => {
-      toast.success(data);
+      if (data === "Bet placed") {
+        return;
+      }
     };
 
     const handleMessages = (messages: MsgUserType[]) => {
@@ -352,7 +352,6 @@ export const Provider = ({ children }: any) => {
           auto: state.userInfo.f.auto,
         };
         if (attrs.userInfo.balance - state.userInfo.f.betAmount < 0) {
-          toast.error("Your balance is not enough");
           betStatus.fbetState = false;
           betStatus.fbetted = false;
           return;
@@ -385,7 +384,6 @@ export const Provider = ({ children }: any) => {
           auto: state.userInfo.s.auto,
         };
         if (attrs.userInfo.balance - state.userInfo.s.betAmount < 0) {
-          toast.error("Your balance is not enough");
           betStatus.sbetState = false;
           betStatus.sbetted = false;
           return;
