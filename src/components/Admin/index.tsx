@@ -13,6 +13,18 @@ interface StoredUser {
   canBet?: boolean;
 }
 
+interface DepositRequest {
+  id: string;
+  userName: string;
+  plan: number;
+  proof: string;
+  status: "Pending" | "Paid" | "Declined";
+  submittedAt: string;
+  adminMessage?: string;
+}
+
+const REQUESTS_KEY = "qt77-deposit-requests";
+
 function loadStoredAccounts(): StoredUser[] {
   if (typeof window === "undefined") return [];
   try {
@@ -22,6 +34,21 @@ function loadStoredAccounts(): StoredUser[] {
   } catch {
     return [];
   }
+}
+
+function loadDepositRequests(): DepositRequest[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(
+      window.localStorage.getItem(REQUESTS_KEY) || "[]",
+    ) as DepositRequest[];
+  } catch {
+    return [];
+  }
+}
+
+function saveDepositRequests(requests: DepositRequest[]) {
+  window.localStorage.setItem(REQUESTS_KEY, JSON.stringify(requests));
 }
 
 function Admin() {
@@ -39,6 +66,11 @@ function Admin() {
   const [isAllowed, setIsAllowed] = React.useState<boolean>(true);
   const [detailsError, setDetailsError] = React.useState<string>("");
   const [detailsSaved, setDetailsSaved] = React.useState<string>("");
+  const [depositRequests, setDepositRequests] = React.useState<
+    DepositRequest[]
+  >(() => loadDepositRequests());
+  const [selectedRequest, setSelectedRequest] =
+    React.useState<DepositRequest | null>(null);
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,11 +94,14 @@ function Admin() {
     setAuthenticated(true);
   };
 
-  const [view, setView] = React.useState<"dashboard" | "users">("dashboard");
+  const [view, setView] = React.useState<"dashboard" | "users" | "requests">(
+    "dashboard",
+  );
 
   React.useEffect(() => {
     if (authenticated) {
       setAccounts(loadStoredAccounts());
+      setDepositRequests(loadDepositRequests());
     }
   }, [authenticated]);
 
@@ -83,6 +118,7 @@ function Admin() {
     setError("");
     setView("dashboard");
     setSelectedUser(null);
+    setSelectedRequest(null);
     setDetailsError("");
     setDetailsSaved("");
   };
@@ -123,6 +159,57 @@ function Admin() {
     setSelectedUser(updatedUser);
     setDetailsError("");
     setDetailsSaved("User details saved successfully.");
+  };
+
+  const openRequestDetails = (request: DepositRequest) => {
+    setSelectedRequest(request);
+  };
+
+  const closeRequestDetails = () => {
+    setSelectedRequest(null);
+  };
+
+  const updateRequestStatus = (
+    requestId: string,
+    status: "Paid" | "Declined",
+    adminMessage: string,
+  ) => {
+    const updatedRequests = depositRequests.map((request) =>
+      request.id === requestId ? { ...request, status, adminMessage } : request,
+    );
+    setDepositRequests(updatedRequests);
+    saveDepositRequests(updatedRequests);
+  };
+
+  const handleApproveRequest = (request: DepositRequest) => {
+    const updatedAccounts = accounts.map((user) => {
+      if (user.userName !== request.userName) return user;
+      return {
+        ...user,
+        balance: parseFloat((user.balance + request.plan).toFixed(2)),
+      };
+    });
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAccounts));
+    setAccounts(updatedAccounts);
+    updateRequestStatus(request.id, "Paid", "Approved and balance updated.");
+    if (selectedRequest?.id === request.id) {
+      setSelectedRequest({
+        ...request,
+        status: "Paid",
+        adminMessage: "Approved and balance updated.",
+      });
+    }
+  };
+
+  const handleDeclineRequest = (request: DepositRequest) => {
+    updateRequestStatus(request.id, "Declined", "Deposit request declined.");
+    if (selectedRequest?.id === request.id) {
+      setSelectedRequest({
+        ...request,
+        status: "Declined",
+        adminMessage: "Deposit request declined.",
+      });
+    }
   };
 
   return (
@@ -183,6 +270,13 @@ function Admin() {
               >
                 Users
               </button>
+              <button
+                className={`admin-nav-item ${view === "requests" ? "active" : ""}`}
+                onClick={() => setView("requests")}
+                type="button"
+              >
+                Requests
+              </button>
             </nav>
             <div className="admin-sidebar-footer">
               <div>Logged in as</div>
@@ -194,12 +288,18 @@ function Admin() {
             <header className="admin-main-header">
               <div>
                 <h2>
-                  {view === "dashboard" ? "Dashboard" : "User Management"}
+                  {view === "dashboard"
+                    ? "Dashboard"
+                    : view === "users"
+                      ? "User Management"
+                      : "Deposit Requests"}
                 </h2>
                 <p className="admin-description">
                   {view === "dashboard"
                     ? "Overview of the application and registered users."
-                    : "All registered users currently stored in the app."}
+                    : view === "users"
+                      ? "All registered users currently stored in the app."
+                      : "Review user payment screenshots and approve or decline deposit requests."}
                 </p>
               </div>
               <button className="admin-logout" onClick={handleLogout}>
@@ -257,6 +357,106 @@ function Admin() {
                     </tbody>
                   </table>
                 </div>
+              </>
+            ) : view === "requests" ? (
+              <>
+                <div className="admin-table-wrapper">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Username</th>
+                        <th>Plan</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {depositRequests.length === 0 ? (
+                        <tr>
+                          <td colSpan={4}>No deposit requests found.</td>
+                        </tr>
+                      ) : (
+                        depositRequests.map((request) => (
+                          <tr
+                            key={request.id}
+                            className="admin-table-row"
+                            onClick={() => openRequestDetails(request)}
+                          >
+                            <td>{request.userName}</td>
+                            <td>{request.plan.toFixed(2)}</td>
+                            <td>{request.status}</td>
+                            <td>
+                              {new Date(request.submittedAt).toLocaleString()}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                {selectedRequest && (
+                  <div className="request-detail-panel">
+                    <div className="request-detail-header">
+                      <div>
+                        <h3>{selectedRequest.userName}</h3>
+                        <p>Payment request review</p>
+                      </div>
+                      <button
+                        className="user-detail-close"
+                        onClick={closeRequestDetails}
+                      >
+                        Close
+                      </button>
+                    </div>
+                    <div className="request-detail-grid">
+                      <div className="detail-field">
+                        <label>Username</label>
+                        <div>{selectedRequest.userName}</div>
+                      </div>
+                      <div className="detail-field">
+                        <label>Plan</label>
+                        <div>{selectedRequest.plan.toFixed(2)} PKR</div>
+                      </div>
+                      <div className="detail-field">
+                        <label>Status</label>
+                        <div>{selectedRequest.status}</div>
+                      </div>
+                      <div className="detail-field">
+                        <label>Submitted</label>
+                        <div>
+                          {new Date(
+                            selectedRequest.submittedAt,
+                          ).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="request-proof-preview">
+                      <label>Screenshot Proof</label>
+                      <img
+                        src={selectedRequest.proof}
+                        alt="Payment screenshot proof"
+                      />
+                    </div>
+                    <div className="request-actions">
+                      <button
+                        className="auth-button"
+                        type="button"
+                        onClick={() => handleApproveRequest(selectedRequest)}
+                        disabled={selectedRequest.status !== "Pending"}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="auth-button decline"
+                        type="button"
+                        onClick={() => handleDeclineRequest(selectedRequest)}
+                        disabled={selectedRequest.status !== "Pending"}
+                      >
+                        Decline
+                      </button>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <>
