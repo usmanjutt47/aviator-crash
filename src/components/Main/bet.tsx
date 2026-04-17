@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 // import { useCrashContext } from "../context";
-import { toast } from "react-toastify";
 import Context, { callCashOut } from "../../context";
 import { ContextDataType } from "../../utils/interfaces";
 
@@ -190,16 +189,12 @@ const Bet = ({ index, add, setAdd }: BetProps) => {
             onAutoBetClick(true);
             setShowModal(false);
           } else {
-            toast.error("Please, specify decrease or exceed stop point");
           }
         } else {
-          toast.error("Can't see 0.00 as stop point");
         }
       } else {
-        toast.error("Please, specify decrease or exceed stop point");
       }
     } else {
-      toast.error("Please, set number of rounds");
     }
   };
   useEffect(() => {
