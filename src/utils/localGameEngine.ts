@@ -117,7 +117,7 @@ export class LocalGameEngine {
 
   private createUser(key: string): UserType {
     return {
-      balance: 10000,
+      balance: 1000,
       userType: false,
       avatar: "/avatars/av-5.png",
       userId: key,
