@@ -8,6 +8,7 @@ import propeller from "./assets/images/propeller.png";
 import Context from "./context";
 
 const REQUESTS_KEY = "qt77-deposit-requests";
+const AUTH_USERS_KEY = "qt77-auth-users";
 
 type DepositRequest = {
   id: string;
@@ -18,6 +19,15 @@ type DepositRequest = {
   submittedAt: string;
   adminMessage?: string;
 };
+
+function loadStoredAccounts() {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(window.localStorage.getItem(AUTH_USERS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
 
 function loadDepositRequests(): DepositRequest[] {
   if (typeof window === "undefined") return [];
@@ -65,12 +75,49 @@ function App() {
     try {
       const parsed = JSON.parse(storedUser) as Partial<typeof userInfo>;
       if (parsed?.userName) {
-        updateUserInfo(parsed);
+        const storedAccounts = loadStoredAccounts();
+        const account = storedAccounts.find(
+          (item: any) => item.userName === parsed.userName,
+        );
+        const syncedUser = account
+          ? {
+              ...parsed,
+              balance: account.balance,
+              currency: account.currency,
+              avatar: account.avatar,
+              email: account.email,
+            }
+          : parsed;
+        window.localStorage.setItem(
+          "qt77-game-user",
+          JSON.stringify(syncedUser),
+        );
+        updateUserInfo(syncedUser);
         setAuthenticated(true);
       }
     } catch {
       // ignore invalid stored data
     }
+  }, [updateUserInfo]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== "qt77-game-user" || !event.newValue) return;
+      try {
+        const updatedUser = JSON.parse(event.newValue) as Partial<
+          typeof userInfo
+        >;
+        if (updatedUser?.userName) {
+          updateUserInfo(updatedUser);
+        }
+      } catch {
+        // ignore invalid storage event data
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, [updateUserInfo]);
 
   const handleAuthenticate = (user: Partial<typeof userInfo>) => {
