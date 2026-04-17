@@ -217,7 +217,7 @@ export default function WebGLStarter() {
         </div>
         {GameState === "GAMEEND" && (
           <div className="crash-result-overlay">
-            Crashed at {Number(target).toFixed(2)}x
+            {Number(target).toFixed(2)}x
           </div>
         )}
         <div
