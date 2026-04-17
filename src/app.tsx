@@ -7,6 +7,33 @@ import propeller from "./assets/images/propeller.png";
 
 import Context from "./context";
 
+const REQUESTS_KEY = "qt77-deposit-requests";
+
+type DepositRequest = {
+  id: string;
+  userName: string;
+  plan: number;
+  proof: string;
+  status: "Pending" | "Paid" | "Declined";
+  submittedAt: string;
+  adminMessage?: string;
+};
+
+function loadDepositRequests(): DepositRequest[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(
+      window.localStorage.getItem(REQUESTS_KEY) || "[]",
+    ) as DepositRequest[];
+  } catch {
+    return [];
+  }
+}
+
+function saveDepositRequests(requests: DepositRequest[]) {
+  window.localStorage.setItem(REQUESTS_KEY, JSON.stringify(requests));
+}
+
 function App() {
   const {
     unityLoading,
@@ -27,6 +54,9 @@ function App() {
   const [depositMessage, setDepositMessage] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawMessage, setWithdrawMessage] = useState("");
+  const [depositRequests, setDepositRequests] = useState<DepositRequest[]>(() =>
+    loadDepositRequests(),
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -55,6 +85,13 @@ function App() {
 
   const isAuthenticated = authenticated;
 
+  const latestRequest = depositRequests
+    .filter((req) => req.userName === (userInfo.userName || "Guest"))
+    .sort(
+      (a, b) =>
+        Number(new Date(b.submittedAt)) - Number(new Date(a.submittedAt)),
+    )[0];
+
   const depositPlans = [
     50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1400, 1600,
     1800,
@@ -77,9 +114,28 @@ function App() {
       setDepositMessage("Please upload a screenshot proof.");
       return;
     }
-    setDepositMessage(
-      "Deposit request submitted. Balance will be added within 1 hour.",
-    );
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const proofString = reader.result as string;
+      const request: DepositRequest = {
+        id: Date.now().toString(),
+        userName: userInfo.userName || "Guest",
+        plan: selectedPlan,
+        proof: proofString,
+        status: "Pending",
+        submittedAt: new Date().toISOString(),
+      };
+      const updatedRequests = [...depositRequests, request];
+      setDepositRequests(updatedRequests);
+      saveDepositRequests(updatedRequests);
+      setDepositMessage(
+        "Deposit request submitted. Balance will be added within 1 hour.",
+      );
+      setProofFile(null);
+      setProofName("");
+    };
+    reader.readAsDataURL(proofFile);
   };
 
   const handleWithdrawSubmit = () => {
@@ -292,6 +348,14 @@ function App() {
                 </button>
               </div>
             </div>
+            {latestRequest && (
+              <div className="deposit-status-banner">
+                <strong>Deposit Request Status:</strong> {latestRequest.status}
+                {latestRequest.adminMessage && (
+                  <span> — {latestRequest.adminMessage}</span>
+                )}
+              </div>
+            )}
 
             <div className="home-games-grid">
               {games.map((game) => (
