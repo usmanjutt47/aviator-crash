@@ -6,6 +6,7 @@ const STORAGE_KEY = "qt77-auth-users";
 
 interface StoredUser {
   userName: string;
+  email?: string;
   password: string;
   avatar: string;
   balance: number;
@@ -332,6 +333,7 @@ function Admin() {
                     <thead>
                       <tr>
                         <th>Username</th>
+                        <th>Email</th>
                         <th>Balance</th>
                         <th>Currency</th>
                       </tr>
@@ -339,7 +341,7 @@ function Admin() {
                     <tbody>
                       {accounts.length === 0 ? (
                         <tr>
-                          <td colSpan={3}>No users found.</td>
+                          <td colSpan={4}>No users found.</td>
                         </tr>
                       ) : (
                         accounts.map((user) => (
@@ -349,6 +351,7 @@ function Admin() {
                             onClick={() => openUserDetails(user)}
                           >
                             <td>{user.userName}</td>
+                            <td>{user.email || "-"}</td>
                             <td>{user.balance.toFixed(2)}</td>
                             <td>{user.currency}</td>
                           </tr>
@@ -465,6 +468,7 @@ function Admin() {
                     <thead>
                       <tr>
                         <th>Username</th>
+                        <th>Email</th>
                         <th>Balance</th>
                         <th>Currency</th>
                       </tr>
@@ -472,7 +476,7 @@ function Admin() {
                     <tbody>
                       {accounts.length === 0 ? (
                         <tr>
-                          <td colSpan={3}>No users found.</td>
+                          <td colSpan={4}>No users found.</td>
                         </tr>
                       ) : (
                         accounts.map((user) => (
@@ -482,6 +486,7 @@ function Admin() {
                             onClick={() => openUserDetails(user)}
                           >
                             <td>{user.userName}</td>
+                            <td>{user.email || "-"}</td>
                             <td>{user.balance.toFixed(2)}</td>
                             <td>{user.currency}</td>
                           </tr>
@@ -508,6 +513,10 @@ function Admin() {
                       <div className="detail-field">
                         <label>Username</label>
                         <div>{selectedUser.userName}</div>
+                      </div>
+                      <div className="detail-field">
+                        <label>Email</label>
+                        <div>{selectedUser.email || "-"}</div>
                       </div>
                       <div className="detail-field">
                         <label>Currency</label>
