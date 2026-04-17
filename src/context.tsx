@@ -356,7 +356,6 @@ export const Provider = ({ children }: any) => {
           betStatus.fbetted = false;
           return;
         }
-        attrs.userInfo.balance -= state.userInfo.f.betAmount;
         engine.playBet(data);
         betStatus.fbetState = false;
         betStatus.fbetted = true;
@@ -388,7 +387,6 @@ export const Provider = ({ children }: any) => {
           betStatus.sbetted = false;
           return;
         }
-        attrs.userInfo.balance -= state.userInfo.s.betAmount;
         engine.playBet(data);
         betStatus.sbetState = false;
         betStatus.sbetted = true;
