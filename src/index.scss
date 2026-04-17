@@ -898,12 +898,66 @@ code {
   font-size: 0.95rem;
 }
 
-.save-success {
-  margin-bottom: 12px;
-  color: #4ade80;
-  font-size: 0.95rem;
+.request-detail-panel,
+.user-detail-panel {
+  background: rgba(15, 20, 48, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 26px;
+  margin-top: 24px;
 }
 
+.request-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.request-detail-grid,
+.user-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.request-proof-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.request-proof-preview img {
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.request-actions {
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.auth-button.decline {
+  background: rgba(248, 113, 113, 0.16);
+  color: #f8b4b4;
+}
+
+.deposit-status-banner {
+  margin-top: 20px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  color: #e0f2fe;
+}
 .p-1r {
   padding: 1rem !important;
 }
