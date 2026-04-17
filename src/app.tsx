@@ -83,6 +83,15 @@ function App() {
     setPageMode("home");
   };
 
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("qt77-game-user");
+    }
+    setAuthenticated(false);
+    setEnteredGame(false);
+    setPageMode("home");
+  };
+
   const isAuthenticated = authenticated;
 
   const latestRequest = depositRequests
@@ -157,12 +166,22 @@ function App() {
         <div className="home-shell">
           <div className="home-topbar">
             <div className="home-logo">QT77 Deposit</div>
-            <button
-              className="home-back-button"
-              onClick={() => setPageMode("home")}
-            >
-              Back
-            </button>
+            <div>
+              <button
+                className="home-logout-button"
+                onClick={handleLogout}
+                type="button"
+              >
+                Logout
+              </button>
+              <button
+                className="home-back-button"
+                onClick={() => setPageMode("home")}
+                type="button"
+              >
+                Back
+              </button>
+            </div>
           </div>
           <div className="wallet-panel">
             <h3>Deposit Plans</h3>
@@ -232,12 +251,22 @@ function App() {
         <div className="home-shell">
           <div className="home-topbar">
             <div className="home-logo">QT77 Withdraw</div>
-            <button
-              className="home-back-button"
-              onClick={() => setPageMode("home")}
-            >
-              Back
-            </button>
+            <div>
+              <button
+                className="home-logout-button"
+                onClick={handleLogout}
+                type="button"
+              >
+                Logout
+              </button>
+              <button
+                className="home-back-button"
+                onClick={() => setPageMode("home")}
+                type="button"
+              >
+                Back
+              </button>
+            </div>
           </div>
           <div className="wallet-panel">
             <h3>Withdraw Request</h3>
@@ -299,6 +328,13 @@ function App() {
           <div className="home-topbar">
             <div className="home-logo">QT77</div>
             <div className="home-top-right">
+              <button
+                className="home-logout-button"
+                onClick={handleLogout}
+                type="button"
+              >
+                Logout
+              </button>
               <span className="home-top-label">How to play?</span>
               <span className="home-balance-label">
                 {Number(userInfo.balance || 0).toFixed(2)}{" "}
