@@ -408,6 +408,15 @@ $btn-color: linear-gradient (90deg, rgb(43, 35, 87) 0%, rgb(43, 35, 87) 100%);
           margin: 0 auto auto;
         }
 
+        .bet-error {
+          margin-top: 8px;
+          color: #ff6b6b;
+          font-size: 12px;
+          text-align: center;
+          width: 100%;
+          max-width: 390px;
+        }
+
         .second-row {
           display: flex;
           width: 100%;
