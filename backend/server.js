@@ -88,7 +88,7 @@ function randomName() {
 
 function createUser(key) {
   return {
-    balance: 10000,
+    balance: 0,
     userType: false,
     avatar: "/avatars/av-5.png",
     userId: key,
