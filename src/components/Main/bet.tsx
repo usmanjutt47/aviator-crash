@@ -29,6 +29,7 @@ const Bet = ({ index, add, setAdd }: BetProps) => {
     updateUserBetState,
   } = context;
   const [cashOut, setCashOut] = React.useState(2);
+  const [betError, setBetError] = React.useState<string>("");
 
   const auto = index === "f" ? state.userInfo.f.auto : state.userInfo.s.auto;
   const betted = index === "f" ? fbetted : sbetted;
@@ -40,6 +41,8 @@ const Bet = ({ index, add, setAdd }: BetProps) => {
   const autoCound = index === "f" ? state.fautoCound : state.sautoCound;
   const betAmount =
     index === "f" ? state.userInfo.f.betAmount : state.userInfo.s.betAmount;
+  const availableBalance = Number(state.userInfo.balance || 0);
+  const canAffordBet = Number(betAmount || 0) <= availableBalance;
   const autoCashoutState =
     index === "f" ? state.fautoCashoutState : state.sautoCashoutState;
   const single = index === "f" ? state.fsingle : state.ssingle;
@@ -101,6 +104,7 @@ const Bet = ({ index, add, setAdd }: BetProps) => {
       }
     }
     update(value);
+    if (betError) setBetError("");
   };
 
   const manualPlus = (amount: number, btnNum: BetOptType) => {
@@ -118,6 +122,7 @@ const Bet = ({ index, add, setAdd }: BetProps) => {
       setBetOpt(btnNum);
     }
     update(value);
+    if (betError) setBetError("");
   };
 
   const changeBetType = (e: GameType) => {
@@ -149,6 +154,11 @@ const Bet = ({ index, add, setAdd }: BetProps) => {
   };
 
   const onBetClick = (s: boolean) => {
+    if (s && !canAffordBet) {
+      setBetError("Insufficient balance for this bet");
+      return;
+    }
+    if (betError) setBetError("");
     updateUserBetState({ [`${index}betState`]: s });
   };
   const setCount = (amount: number) => {
@@ -419,15 +429,22 @@ const Bet = ({ index, add, setAdd }: BetProps) => {
                 </button>
               </>
             ) : (
-              <button onClick={() => onBetClick(true)} className="btn-success">
-                <span>
-                  <label>BET</label>
-                  <label className="amount">
-                    <span>{Number(betAmount).toFixed(2)}</span>
-                    <span className="currency">PKR</span>
-                  </label>
-                </span>
-              </button>
+              <>
+                <button
+                  onClick={() => onBetClick(true)}
+                  className="btn-success"
+                  disabled={!canAffordBet}
+                >
+                  <span>
+                    <label>BET</label>
+                    <label className="amount">
+                      <span>{Number(betAmount).toFixed(2)}</span>
+                      <span className="currency">PKR</span>
+                    </label>
+                  </span>
+                </button>
+                {betError && <div className="bet-error">{betError}</div>}
+              </>
             )}
           </div>
         </div>
