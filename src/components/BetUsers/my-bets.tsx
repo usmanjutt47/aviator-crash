@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import copy from "copy-to-clipboard";
-import { toast } from "react-hot-toast";
 
 import Context from "../../context";
 import { SeedModal } from "../Main/seedModal";
@@ -98,7 +97,6 @@ const MyBets = () => {
                     className="share-i"
                     onClick={() => {
                       copy(`${user.flyDetailID}`);
-                      toast.success("Copied for Fly ID!");
                     }}
                   ></div>
                 </div>
