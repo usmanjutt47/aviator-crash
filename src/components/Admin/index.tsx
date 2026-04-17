@@ -191,6 +191,31 @@ function Admin() {
       };
     });
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAccounts));
+
+    if (typeof window !== "undefined") {
+      const currentGameUserJson = window.localStorage.getItem("qt77-game-user");
+      if (currentGameUserJson) {
+        try {
+          const currentGameUser = JSON.parse(currentGameUserJson);
+          if (currentGameUser.userName === request.userName) {
+            const updatedGameUser = {
+              ...currentGameUser,
+              balance:
+                updatedAccounts.find(
+                  (user) => user.userName === request.userName,
+                )?.balance ?? currentGameUser.balance,
+            };
+            window.localStorage.setItem(
+              "qt77-game-user",
+              JSON.stringify(updatedGameUser),
+            );
+          }
+        } catch {
+          // ignore invalid game user data
+        }
+      }
+    }
+
     setAccounts(updatedAccounts);
     updateRequestStatus(request.id, "Paid", "Approved and balance updated.");
     if (selectedRequest?.id === request.id) {
