@@ -128,7 +128,8 @@ function App() {
     } catch {
       // ignore invalid stored data
     }
-  }, [updateUserInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -148,7 +149,8 @@ function App() {
 
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [updateUserInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Sync URL to pageMode on mount and when location changes (read from URL)
   useEffect(() => {
