@@ -242,19 +242,19 @@ $whiteBg: #868b8d;
     justify-content: space-between;
   }
 
-  &>p {
+  & > p {
     margin: 0;
     padding: 0.375rem 0.88rem;
     border-bottom: 1px solid rgb(235, 235, 235);
     min-width: 140px;
   }
 
-  &>p:hover {
+  & > p:hover {
     color: #fff;
     background-color: #0062cc;
   }
 
-  &>p:last-child {
+  & > p:last-child {
     border-bottom: 0 none;
   }
 
@@ -475,7 +475,7 @@ $whiteBg: #868b8d;
 
 .btn-outline-secondary:not(:disabled):not(.disabled):active,
 .btn-outline-secondary:not(:disabled):not(.disabled).active,
-.show>.btn-outline-secondary.dropdown-toggle {
+.show > .btn-outline-secondary.dropdown-toggle {
   color: #fff;
   background-color: #6c757d;
   border-color: #6c757d;
@@ -483,7 +483,7 @@ $whiteBg: #868b8d;
 
 .btn-outline-secondary:not(:disabled):not(.disabled):active:focus,
 .btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
-.show>.btn-outline-secondary.dropdown-toggle:focus {
+.show > .btn-outline-secondary.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem #6c757d80;
 }
 
@@ -516,4 +516,103 @@ $whiteBg: #868b8d;
 
 .chat-size {
   width: calc(100% - 145px);
+}
+
+/* Mobile Responsive Styles for Header */
+@media (max-width: 768px) {
+  .banner {
+    padding: 0 12px;
+    height: 36px;
+  }
+
+  .banner .logo-img {
+    height: 24px;
+  }
+
+  .banner .balance {
+    font-size: 12px;
+  }
+
+  .header-first {
+    gap: 12px;
+  }
+
+  .key-container {
+    max-width: 100%;
+    padding: 10px 16px 12px 14px;
+    font-size: 11px;
+    margin-top: 3px;
+  }
+
+  .key-container .key {
+    margin-right: 6px;
+    height: 18px;
+  }
+
+  .server-key-container {
+    max-width: 100%;
+    padding: 10px 16px 12px 14px;
+  }
+
+  .setting-dropdown {
+    width: 280px;
+    transform: translate(-242px, 26px);
+  }
+
+  .chat-size {
+    width: calc(100% - 120px);
+  }
+
+  .content .game-img {
+    width: 60px;
+    height: 60px;
+    border-width: 3px;
+  }
+
+  .img-btn {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner {
+    padding: 0 8px;
+    height: 34px;
+  }
+
+  .banner .logo-img {
+    height: 20px;
+  }
+
+  .banner .balance {
+    font-size: 11px;
+    display: none;
+  }
+
+  .header-first {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .key-container {
+    padding: 8px 12px 10px 10px;
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  .chat-size {
+    width: calc(100% - 100px);
+  }
+
+  .content .game-img {
+    width: 50px;
+    height: 50px;
+    border-width: 2px;
+  }
+
+  .img-btn {
+    width: 50px;
+    height: 50px;
+  }
 }

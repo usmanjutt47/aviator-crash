@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./components/header";
 import BetsUsers from "./components/bet-users";
 import Main from "./components/Main";
@@ -73,8 +74,12 @@ function App() {
     userInfo,
     updateUserInfo,
   } = React.useContext(Context);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [authenticated, setAuthenticated] = useState(false);
   const [enteredGame, setEnteredGame] = useState(false);
+  const [selectedGameId, setSelectedGameId] = useState<string>("");
+  const [selectedGameTitle, setSelectedGameTitle] = useState<string>("");
   const [pageMode, setPageMode] = useState<"home" | "deposit" | "withdraw">(
     "home",
   );
@@ -145,14 +150,43 @@ function App() {
     return () => window.removeEventListener("storage", handleStorage);
   }, [updateUserInfo]);
 
+  // Sync URL to pageMode on mount and when location changes (read from URL)
+  useEffect(() => {
+    if (!authenticated) return;
+    const path = location.pathname;
+    if (path.includes("/deposit")) {
+      setPageMode("deposit");
+      setEnteredGame(false);
+    } else if (path.includes("/withdraw")) {
+      setPageMode("withdraw");
+      setEnteredGame(false);
+    } else if (path.includes("/game/")) {
+      setPageMode("home");
+      setEnteredGame(true);
+      const gameId = path.split("/game/")[1];
+      setSelectedGameId(gameId);
+      const title = gameId
+        .replace(/\.[^/.]+$/, "")
+        .split(/[-_]+/)
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+      setSelectedGameTitle(title);
+    } else {
+      setPageMode("home");
+      setEnteredGame(false);
+      setSelectedGameId("");
+      setSelectedGameTitle("");
+    }
+  }, [location.pathname, authenticated]);
+
   const handleAuthenticate = (user: Partial<typeof userInfo>) => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem("qt77-game-user", JSON.stringify(user));
     }
     updateUserInfo(user);
     setAuthenticated(true);
-    setEnteredGame(false);
-    setPageMode("home");
+    navigate("/home");
   };
 
   const handleLogout = () => {
@@ -162,6 +196,7 @@ function App() {
     setAuthenticated(false);
     setEnteredGame(false);
     setPageMode("home");
+    navigate("/");
   };
 
   const isAuthenticated = authenticated;
@@ -266,7 +301,7 @@ function App() {
               </button>
               <button
                 className="home-back-button"
-                onClick={() => setPageMode("home")}
+                onClick={() => navigate("/home")}
                 type="button"
               >
                 Back
@@ -349,7 +384,7 @@ function App() {
               </button>
               <button
                 className="home-back-button"
-                onClick={() => setPageMode("home")}
+                onClick={() => navigate("/home")}
                 type="button"
               >
                 Back
@@ -490,7 +525,7 @@ function App() {
                 <button
                   className="home-action-button deposit"
                   onClick={() => {
-                    setPageMode("deposit");
+                    navigate("/deposit");
                     setDepositMessage("");
                     setSelectedPlan(null);
                     setProofFile(null);
@@ -502,7 +537,7 @@ function App() {
                 <button
                   className="home-action-button withdraw"
                   onClick={() => {
-                    setPageMode("withdraw");
+                    navigate("/withdraw");
                     setWithdrawMessage("");
                     setWithdrawAmount("");
                     setWithdrawMethod("EasyPaisa");
@@ -528,7 +563,12 @@ function App() {
                 <div
                   key={game.img}
                   className={`game-card ${game.enabled ? "game-card-active" : "disabled"}`}
-                  onClick={() => game.enabled && setEnteredGame(true)}
+                  onClick={() => {
+                    if (game.enabled) {
+                      const gameId = game.img.split("/")[1];
+                      navigate(`/game/${gameId}`);
+                    }
+                  }}
                 >
                   <div
                     className="game-card-image"
@@ -594,7 +634,7 @@ function App() {
           </div>
         </div>
       )}
-      <Header />
+      <Header gameTitle={selectedGameTitle} />
       <div className="game-container">
         <BetsUsers />
         <Main />

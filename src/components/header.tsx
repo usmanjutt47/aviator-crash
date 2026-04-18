@@ -4,7 +4,12 @@ import logo from "../assets/images/logo.svg";
 import refound from "../assets/images/refund.png";
 import "../index.scss";
 import Context from "../context";
-export default function Header() {
+
+interface HeaderProps {
+  gameTitle?: string;
+}
+
+export default function Header({ gameTitle }: HeaderProps) {
   const { userInfo } = React.useContext(Context);
 
   const [howto, setHowto] = React.useState<"howto" | "short" | "more" | "">(
@@ -23,6 +28,7 @@ export default function Header() {
       <div className="header-container">
         <div className="logo-container">
           <img src={logo} alt="logo" className="logo"></img>
+          {gameTitle && <span className="game-title-header">{gameTitle}</span>}
         </div>
         <div className="second-block">
           {userInfo.userType && (

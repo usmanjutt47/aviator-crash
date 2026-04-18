@@ -12,7 +12,11 @@ createRoot(document.getElementById("root") as HTMLElement).render(
     <Provider>
       <Routes>
         <Route path="/admin" element={<Admin />} />
-        <Route path="/*" element={<App />} />
+        <Route path="/home" element={<App />} />
+        <Route path="/deposit" element={<App />} />
+        <Route path="/withdraw" element={<App />} />
+        <Route path="/game/:gameId" element={<App />} />
+        <Route path="/" element={<App />} />
       </Routes>
     </Provider>
   </BrowserRouter>,
