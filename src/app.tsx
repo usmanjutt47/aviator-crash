@@ -64,6 +64,11 @@ function App() {
   const [depositMessage, setDepositMessage] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawMessage, setWithdrawMessage] = useState("");
+  const [withdrawMethod, setWithdrawMethod] = useState<
+    "JazzCash" | "EasyPaisa"
+  >("EasyPaisa");
+  const [withdrawAccountName, setWithdrawAccountName] = useState("");
+  const [withdrawAccountNumber, setWithdrawAccountNumber] = useState("");
   const [depositRequests, setDepositRequests] = useState<DepositRequest[]>(() =>
     loadDepositRequests(),
   );
@@ -193,11 +198,32 @@ function App() {
 
   const handleWithdrawSubmit = () => {
     const amount = Number(withdrawAmount);
+    if (!withdrawAccountName.trim()) {
+      setWithdrawMessage("Please enter the account holder name.");
+      return;
+    }
+    if (!withdrawAccountNumber.trim()) {
+      setWithdrawMessage("Please enter the account number.");
+      return;
+    }
     if (!amount || amount <= 0) {
       setWithdrawMessage("Please enter a valid withdraw amount.");
       return;
     }
-    setWithdrawMessage(`Withdraw request for ${amount.toFixed(2)} submitted.`);
+    if (amount > (userInfo.balance || 0)) {
+      setWithdrawMessage(
+        "Please enter an amount less than or equal to your account balance.",
+      );
+      return;
+    }
+    setWithdrawMessage(
+      `Withdraw request for ${amount.toFixed(2)} via ${withdrawMethod} submitted for ${withdrawAccountName} (${withdrawAccountNumber}). Your account balance is unchanged.`,
+    );
+  };
+
+  const handleWithdrawMax = () => {
+    setWithdrawAmount(Number(userInfo.balance || 0).toFixed(2));
+    setWithdrawMessage("");
   };
 
   if (!isAuthenticated) {
@@ -312,13 +338,69 @@ function App() {
           </div>
           <div className="wallet-panel">
             <h3>Withdraw Request</h3>
-            <div className="deposit-upload">
+            <div className="deposit-info-row">
+              <div className="deposit-info-card">
+                <div className="deposit-info-label">Balance</div>
+                <div className="deposit-info-value">
+                  {Number(userInfo.balance || 0).toFixed(2)}{" "}
+                  {userInfo.currency || "PKR"}
+                </div>
+              </div>
+            </div>
+            <div className="withdraw-input-row">
+              <input
+                type="text"
+                placeholder="Account holder name"
+                value={withdrawAccountName}
+                onChange={(event) => setWithdrawAccountName(event.target.value)}
+              />
+            </div>
+            <div className="withdraw-input-row">
+              <input
+                type="text"
+                placeholder="Account number"
+                value={withdrawAccountNumber}
+                onChange={(event) =>
+                  setWithdrawAccountNumber(event.target.value)
+                }
+              />
+            </div>
+            <div className="withdraw-input-row">
               <input
                 type="number"
                 placeholder="Amount to withdraw"
                 value={withdrawAmount}
                 onChange={(event) => setWithdrawAmount(event.target.value)}
               />
+              <button
+                type="button"
+                className="withdraw-max-button"
+                onClick={handleWithdrawMax}
+              >
+                Max
+              </button>
+            </div>
+            <div className="withdraw-methods">
+              <label>
+                <input
+                  type="radio"
+                  name="withdrawMethod"
+                  value="JazzCash"
+                  checked={withdrawMethod === "JazzCash"}
+                  onChange={() => setWithdrawMethod("JazzCash")}
+                />
+                JazzCash
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="withdrawMethod"
+                  value="EasyPaisa"
+                  checked={withdrawMethod === "EasyPaisa"}
+                  onChange={() => setWithdrawMethod("EasyPaisa")}
+                />
+                EasyPaisa
+              </label>
             </div>
             <button
               className="auth-button"
@@ -420,6 +502,9 @@ function App() {
                     setPageMode("withdraw");
                     setWithdrawMessage("");
                     setWithdrawAmount("");
+                    setWithdrawMethod("EasyPaisa");
+                    setWithdrawAccountName("");
+                    setWithdrawAccountNumber("");
                   }}
                 >
                   Withdraw
