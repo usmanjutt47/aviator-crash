@@ -198,7 +198,9 @@ export default function WebGLStarter() {
       <div className="space-box" ref={spaceRef} id="space">
         <Unity
           unityContext={myUnityContext}
-          matchWebGLToCanvasSize={true}
+          matchWebGLToCanvasSize={false}
+          className="unity-canvas"
+          tabIndex={0}
           style={{
             position: "absolute",
             width: "100%",
