@@ -671,7 +671,7 @@ code {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 220px;
+  min-height: 340px;
   padding: 22px;
   border-radius: 24px;
   background: rgba(10, 15, 34, 0.96);
@@ -694,11 +694,14 @@ code {
 }
 
 .game-card-image {
-  height: 120px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, #11182f, #0f1121);
+  height: 230px;
+  border-radius: 15px;
+  background-color: #11182f;
   margin-bottom: 16px;
   position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .game-card-image.aviator {

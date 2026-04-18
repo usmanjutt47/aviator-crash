@@ -420,9 +420,9 @@ function App() {
 
   const games = [
     {
-      title: "QT77",
+      title: "Aviator",
       subtitle: "Play Now",
-      img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
+      img: "/aviator.jpeg",
       enabled: true,
     },
     {
