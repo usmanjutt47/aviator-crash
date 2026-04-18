@@ -389,14 +389,14 @@ const Bet = ({ index, add, setAdd }: BetProps) => {
                 <button
                   className="btn-waiting"
                   onClick={() => {
-                    callCashOut(currentTarget, index);
+                    callCashOut(currentSecondNum, index);
                   }}
                 >
                   <span>
                     <label>CASHOUT</label>
                     <label className="amount">
                       <span>
-                        {Number(betAmount * currentTarget).toFixed(2)}
+                        {Number(betAmount * currentSecondNum).toFixed(2)}
                       </span>
                       <span className="currency">PKR</span>
                     </label>
