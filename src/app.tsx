@@ -148,10 +148,7 @@ function App() {
         Number(new Date(b.submittedAt)) - Number(new Date(a.submittedAt)),
     )[0];
 
-  const depositPlans = [
-    50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1400, 1600,
-    1800,
-  ];
+  const depositPlans = [300, 500, 1000, 1500, 2000, 5000, 10000];
 
   const handleProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -234,11 +231,9 @@ function App() {
             <h3>Deposit Plans</h3>
             <div className="deposit-info-row">
               <div className="deposit-info-card">
-                <div className="deposit-info-label">JazzCash / EasyPaisa</div>
-                <div className="deposit-info-value">03043061019</div>
-                <div className="deposit-info-subtitle">
-                  Muhammad Usman Tariq
-                </div>
+                <div className="deposit-info-label">EasyPaisa</div>
+                <div className="deposit-info-value">03096655156</div>
+                <div className="deposit-info-subtitle">Tariq Masih</div>
               </div>
               <div className="deposit-info-card">
                 <div className="deposit-info-label">Upload screenshot</div>
