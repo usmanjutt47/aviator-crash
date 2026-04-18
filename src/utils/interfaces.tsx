@@ -24,6 +24,7 @@ export interface UserType {
   userType: boolean;
   avatar: string;
   userId: string;
+  email?: string;
   currency: string;
   userName: string;
   ipAddress: string;
