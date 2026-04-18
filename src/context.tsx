@@ -77,7 +77,7 @@ export const Provider = ({ children }: any) => {
 
   const [bettedUsers, setBettedUsers] = React.useState<BettedUserType[]>([]);
   const update = (attrs: Partial<ContextDataType>) => {
-    setState({ ...state, ...attrs });
+    setState((prev) => ({ ...prev, ...attrs }));
   };
   const [previousHand, setPreviousHand] = React.useState<BettedUserType[]>([]);
   const [history, setHistory] = React.useState<number[]>([]);
@@ -170,8 +170,9 @@ export const Provider = ({ children }: any) => {
     };
 
     const handleMyInfo = (user: UserType) => {
-      setUserInfo(user);
-      update({ userInfo: user });
+      const clonedUser = JSON.parse(JSON.stringify(user));
+      setUserInfo(clonedUser);
+      update({ userInfo: clonedUser });
     };
 
     const handleHistory = (historyData: number[]) => {
@@ -327,15 +328,24 @@ export const Provider = ({ children }: any) => {
   }, [token]);
 
   React.useEffect(() => {
-    let attrs = state;
-    let betStatus = userBetState;
+    let attrs = { ...state };
+    let betStatus = { ...userBetState };
+    let stateChanged = false;
+    let betStateChanged = false;
+    
     if (gameState.GameState === "BET") {
       if (betStatus.fbetState) {
         if (state.userInfo.f.auto) {
-          if (state.fautoCound > 0) attrs.fautoCound -= 1;
-          else {
+          if (state.fautoCound > 0) {
+            attrs.fautoCound -= 1;
+            stateChanged = true;
+          } else {
             attrs.userInfo.f.auto = false;
             betStatus.fbetState = false;
+            stateChanged = true;
+            betStateChanged = true;
+            update(attrs);
+            setUserBetState(betStatus);
             return;
           }
         }
@@ -353,19 +363,23 @@ export const Provider = ({ children }: any) => {
         if (attrs.userInfo.balance - state.userInfo.f.betAmount < 0) {
           betStatus.fbetState = false;
           betStatus.fbetted = false;
+          setUserBetState(betStatus);
           return;
         }
         engine.playBet(data);
-        betStatus.fbetState = false;
-        betStatus.fbetted = true;
-        setUserBetState(betStatus);
       }
       if (betStatus.sbetState) {
         if (state.userInfo.s.auto) {
-          if (state.sautoCound > 0) attrs.sautoCound -= 1;
-          else {
+          if (state.sautoCound > 0) {
+            attrs.sautoCound -= 1;
+            stateChanged = true;
+          } else {
             attrs.userInfo.s.auto = false;
             betStatus.sbetState = false;
+            stateChanged = true;
+            betStateChanged = true;
+            update(attrs);
+            setUserBetState(betStatus);
             return;
           }
         }
@@ -383,12 +397,14 @@ export const Provider = ({ children }: any) => {
         if (attrs.userInfo.balance - state.userInfo.s.betAmount < 0) {
           betStatus.sbetState = false;
           betStatus.sbetted = false;
+          setUserBetState(betStatus);
           return;
         }
         engine.playBet(data);
-        betStatus.sbetState = false;
-        betStatus.sbetted = true;
-        setUserBetState(betStatus);
+      }
+      
+      if (stateChanged) {
+        update(attrs);
       }
     }
   }, [gameState.GameState, userBetState.fbetState, userBetState.sbetState]);
@@ -402,7 +418,7 @@ export const Provider = ({ children }: any) => {
     if (gameState.GameState === "BET") getMyBets();
   }, [gameState.GameState]);
 
-  const updateUserInfo = (attrs: Partial<UserType>) => {
+  const updateUserInfo = React.useCallback((attrs: Partial<UserType>) => {
     setUserInfo((prev) => {
       const updated = { ...prev, ...attrs };
       if (updated.userId) {
@@ -410,7 +426,7 @@ export const Provider = ({ children }: any) => {
       }
       return updated;
     });
-  };
+  }, []);
   const handleGetSeed = () => {
     const seedValue = Math.random().toString(36).slice(2, 12);
     update({ seed: seedValue });
