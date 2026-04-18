@@ -9,6 +9,17 @@ import Context from "./context";
 
 const REQUESTS_KEY = "qt77-deposit-requests";
 const AUTH_USERS_KEY = "qt77-auth-users";
+const HOME_GAME_IMAGE_FILES = [
+  "aviator.jpeg",
+  "fly-x.jpeg",
+  "casino-night.jpeg",
+  "chiken-road.jpeg",
+  "money-coming.jpeg",
+  "superace.jpeg",
+  "tower-block.jpeg",
+  "jackpot.jpeg",
+  "piggy-bank-plunder.jpeg",
+];
 
 type DepositRequest = {
   id: string;
@@ -42,6 +53,15 @@ function loadDepositRequests(): DepositRequest[] {
 
 function saveDepositRequests(requests: DepositRequest[]) {
   window.localStorage.setItem(REQUESTS_KEY, JSON.stringify(requests));
+}
+
+function getGameTitleFromFileName(fileName: string) {
+  const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, "");
+  return nameWithoutExtension
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 function App() {
@@ -418,32 +438,15 @@ function App() {
     );
   }
 
-  const games = [
-    {
-      title: "Aviator",
-      subtitle: "Play Now",
-      img: "/aviator.jpeg",
-      enabled: true,
-    },
-    {
-      title: "Money Coming",
-      subtitle: "Coming Soon",
-      img: "https://images.unsplash.com/photo-1512446733611-9099a758e54e?auto=format&fit=crop&w=800&q=80",
-      enabled: false,
-    },
-    {
-      title: "Fortune Gems 2",
-      subtitle: "Coming Soon",
-      img: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80",
-      enabled: false,
-    },
-    {
-      title: "Treasure Bowl",
-      subtitle: "Coming Soon",
-      img: "https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=800&q=80",
-      enabled: false,
-    },
-  ];
+  const games = HOME_GAME_IMAGE_FILES.map((fileName) => {
+    const isAviator = fileName.toLowerCase() === "aviator.jpeg";
+    return {
+      title: getGameTitleFromFileName(fileName),
+      subtitle: isAviator ? "Play Now" : "Coming Soon",
+      img: `/${fileName}`,
+      enabled: isAviator,
+    };
+  });
 
   if (!enteredGame) {
     return (
@@ -523,7 +526,7 @@ function App() {
             <div className="home-games-grid">
               {games.map((game) => (
                 <div
-                  key={game.title}
+                  key={game.img}
                   className={`game-card ${game.enabled ? "game-card-active" : "disabled"}`}
                   onClick={() => game.enabled && setEnteredGame(true)}
                 >
